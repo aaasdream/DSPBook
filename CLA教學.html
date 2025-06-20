@@ -1,0 +1,994 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CLA 控制律加速器終極指南 - 老張開釋啦！</title>
+    <style>
+        :root {
+            /* Dark Theme Variables */
+            --primary-bg: #1e1e1e;
+            --secondary-bg: #2d2d2d;
+            --text-color: #e0e0e0;
+            --heading-color: #569cd6; /* A common color for headings in dark themes */
+            --accent-color: #6a9fb5; /* A softer accent for dark mode */
+            --code-bg: #1a1a1a;
+            --code-text: #d4d4d4;
+            --pitfall-bg: #3a321e; /* Darker yellow */
+            --pitfall-border: #5c4d23;
+            --pitfall-text: #fff3cd;
+            --laozhang-color: #ce9178; /* A common color for "warnings" or special text in dark */
+            --sound-effect-color: #b5cea8;
+            --border-color: #444444;
+            --toc-bg: #252526;
+            --toc-link-color: #cccccc;
+            --toc-link-hover-bg: #3e3e42;
+            --newbie-os-color: #9cdcfe;
+            --newbie-os-border: #4fc1ff;
+            --img-placeholder-bg: #2a2a2a;
+            --img-placeholder-text: #888888;
+            --table-border-color: #4a4a4a;
+            --table-header-bg: #333333;
+            --table-row-hover-bg: #383838;
+        }
+
+        body {
+            font-family: 'Segoe UI', 'Microsoft JhengHei', 'PingFang TC', sans-serif;
+            line-height: 1.7;
+            margin: 0;
+            padding: 0;
+            background-color: var(--primary-bg);
+            color: var(--text-color);
+            padding-top: 80px; /* Space for fixed TOC */
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 20px auto;
+            padding: 20px 30px;
+            background-color: var(--secondary-bg);
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.2); /* Adjusted shadow for dark */
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+        }
+
+        #toc {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            background-color: var(--toc-bg);
+            color: var(--toc-link-color);
+            padding: 10px 0;
+            z-index: 1000;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+            overflow-x: auto;
+            white-space: nowrap;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        #toc ul {
+            list-style-type: none;
+            padding: 0 20px;
+            margin: 0;
+            display: flex;
+            justify-content: center;
+        }
+
+        #toc li {
+            margin: 0 10px;
+        }
+
+        #toc a {
+            color: var(--toc-link-color);
+            text-decoration: none;
+            font-weight: bold;
+            padding: 5px 10px;
+            border-radius: 4px;
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+
+        #toc a:hover, #toc a.active {
+            background-color: var(--toc-link-hover-bg);
+            color: var(--heading-color);
+        }
+
+        h1, h2, h3, h4 {
+            color: var(--heading-color);
+            margin-top: 1.5em;
+            margin-bottom: 0.8em;
+            scroll-margin-top: 100px; /* Offset for fixed TOC */
+        }
+
+        h1 {
+            text-align: center;
+            font-size: 2.2em;
+            border-bottom: 2px solid var(--accent-color);
+            padding-bottom: 0.5em;
+            color: var(--accent-color); /* Emphasize H1 */
+        }
+
+        h2 {
+            font-size: 1.8em;
+            border-left: 4px solid var(--accent-color);
+            padding-left: 10px;
+        }
+
+        h3 {
+            font-size: 1.4em;
+        }
+        
+        h4 {
+            font-size: 1.2em;
+            color: #9cdcfe; /* Lighter blue for H4 */
+        }
+
+        p {
+            margin-bottom: 1em;
+        }
+
+        pre {
+            background-color: var(--code-bg);
+            color: var(--code-text);
+            padding: 15px;
+            border-radius: 5px;
+            overflow-x: auto;
+            font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+            font-size: 0.9em;
+            margin-bottom: 1.5em;
+            border: 1px solid var(--border-color);
+        }
+
+        code {
+            font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+            background-color: #333; /* Darker inline code bg */
+            color: var(--code-text);
+            padding: 2px 4px;
+            border-radius: 3px;
+            font-size: 0.9em;
+        }
+
+        pre code {
+            background-color: transparent;
+            padding: 0;
+            border-radius: 0;
+            border: none;
+        }
+
+        strong {
+            color: var(--accent-color);
+            font-weight: bold; /* Ensure strong is visibly bold */
+        }
+
+        ul, ol {
+            margin-bottom: 1em;
+            padding-left: 20px;
+        }
+
+        li {
+            margin-bottom: 0.5em;
+        }
+
+        .pitfall, .laozhang-tip {
+            background-color: var(--pitfall-bg);
+            border: 1px solid var(--pitfall-border);
+            color: var(--pitfall-text);
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 5px;
+            border-left: 5px solid var(--laozhang-color);
+        }
+        .pitfall::before {
+            content: "老張警告：天坑！ ";
+            font-weight: bold;
+            color: var(--laozhang-color);
+        }
+        .laozhang-tip::before {
+            content: "老張提點： ";
+            font-weight: bold;
+            color: var(--laozhang-color);
+        }
+
+
+        .sound-effect {
+            font-style: italic;
+            color: var(--sound-effect-color);
+            display: block;
+            text-align: center;
+            margin: 10px 0;
+        }
+
+        .newbie-os {
+            font-style: italic;
+            color: var(--newbie-os-color);
+            display: block;
+            margin: 5px 0 15px 20px;
+            padding-left: 10px;
+            border-left: 3px solid var(--newbie-os-border);
+        }
+
+        .img-placeholder { 
+            border: 1px dashed var(--border-color);
+            padding: 20px;
+            text-align: center;
+            font-style: italic;
+            color: var(--img-placeholder-text);
+            margin-bottom: 1em;
+            background-color: var(--img-placeholder-bg);
+        }
+
+        #back-to-top {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background-color: var(--accent-color);
+            color: var(--primary-bg); /* Dark text on light button */
+            border: none;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            font-size: 24px;
+            cursor: pointer;
+            display: none; 
+            z-index: 999;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+            transition: opacity 0.3s, visibility 0.3s;
+        }
+        #back-to-top:hover {
+            background-color: var(--heading-color); /* Consistent hover with TOC active */
+        }
+        
+        .sop-section ol {
+            list-style-type: decimal;
+            padding-left: 30px;
+        }
+        .sop-section ol li {
+            margin-bottom: 10px;
+            line-height: 1.6;
+        }
+        .sop-section strong {
+            color: var(--laozhang-color); /* Highlight key actions */
+        }
+        .sop-section code {
+             color: var(--sound-effect-color); /* Different color for code in SOP for emphasis */
+        }
+
+
+        /* Responsive TOC */
+        @media (max-width: 768px) {
+            #toc ul {
+                justify-content: flex-start; /* Align to left on small screens */
+            }
+            .container {
+                padding: 15px;
+            }
+            h1 { font-size: 1.8em; }
+            h2 { font-size: 1.5em; }
+            h3 { font-size: 1.2em; }
+            h4 { font-size: 1.1em; }
+        }
+
+        /* Table Styles */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            font-size: 0.9em;
+            border: 1px solid var(--table-border-color);
+        }
+
+        table th, table td {
+            border: 1px solid var(--table-border-color);
+            padding: 8px 10px;
+            text-align: left;
+        }
+
+        table th {
+            background-color: var(--table-header-bg);
+            color: var(--heading-color);
+            font-weight: bold;
+        }
+
+        table tr:nth-child(even) {
+            background-color: var(--primary-bg); /* Slightly different for even rows if needed */
+        }
+        table tr:nth-child(odd) {
+            background-color: var(--secondary-bg); /* Keep consistent with container bg */
+        }
+
+
+        table tr:hover {
+            background-color: var(--table-row-hover-bg);
+        }
+
+        .table-container {
+            max-height: 400px; /* Limit table height and enable scroll */
+            overflow-y: auto;
+            border: 1px solid var(--table-border-color);
+            margin-bottom: 1em;
+        }
+
+
+    </style>
+</head>
+<body>
+
+    <nav id="toc">
+        <ul>
+            <!-- TOC items will be injected here by JavaScript -->
+        </ul>
+    </nav>
+
+    <div class="container">
+        <h1>CLA 控制律加速器終極指南 - 老張開釋啦！</h1>
+
+        <div class="img-placeholder">
+            （辦公室裡，老張叼著一根沒點的菸，看著新人小李對著示波器上的波形愁眉苦臉）
+        </div>
+        <p><strong>老張：</strong>「喂，小李。對，叫你呢，別看了，你那塊板子上的馬達再抖下去，就要原地起飛了。過來一下。」</p>
+        <p><strong>老張：</strong>「你看你這個表情，跟便祕三天一樣。是不是覺得這顆 C2000 微控制器很秋條？主頻跑個幾百兆，功能一大堆，結果你一個小小的控制迴路，CPU 佔用率就快頂到天花板了？主程式那邊還想做個漂亮的 UI 跟通訊？門都沒有。」</p>
+        <p><strong>老張：</strong>「我跟你說，這就是典型的『沒摸熟架構就想一步登天』的症頭。你以為德州儀器（TI）那群人是吃素的？他們早就想到這問題了。來，茶杯拿著，我今天心情好，跟你講個東西，叫做『Control Law Accelerator』，控制律加速器，簡稱 CLA。」</p>
+        <p><span class="sound-effect">（罐頭音效：登登登登～ 氣勢磅礡的音樂）</span></p>
+
+        <section id="intro">
+            <h2>開場白：CLA 是你 CPU 的神隊友！</h2>
+            <p><strong>老張：</strong>「你不要聽到『加速器』三個字就高潮了，它不是什麼氮氣瓶，按下去你的程式碼就會跑得跟火箭一樣快。你要把它想像成，你，也就是主CPU，是個大老闆，每天要管公司營運、要看財報、要跟客戶吃飯、還要應付老闆的老闆，事情多得要死。你很忙，對吧？」</p>
+            <p><strong>老張：</strong>「現在，公司有個部門，專門負責一個極度重要、極度規律、但又極度無聊的工作，比如說，每毫秒要精準地調整一次生產線上的馬達轉速。這個工作不能等，你一分心，馬達可能就燒了，或是產品就歪了。你這個大老闆，總不能為了這件鳥事，把所有客戶的電話都掛掉吧？」</p>
+            <p><strong>老張：</strong>「CLA 就是你請來的一個超級書呆子，一個數學宅男。你把他關在一個小房間裡，跟他說：『嘿，宅男，從現在開始，生產線上的所有數學運算，ADC 採樣一進來，你就要立刻、馬上、'Just-in-time' 地給我算完，然後把結果丟給 PWM 模組。做完你就可以繼續發呆，沒做完你就死定了。其他所有跟客戶溝通、跟老闆屁話的事情，都交給我這個大老闆來處理。』」</p>
+            <p>所以啦，簡單一句話：<strong>CLA 就是讓你把 C28x CPU 從水深火熱的即時控制迴圈中解放出來的超級賽亞人！</strong> 它能做到「Just-in-time」讀取 ADC 採樣，大幅縮短從採樣到輸出的延遲，讓你的系統反應跟閃電一樣快，控制迴圈頻率也能拉得更高。聽起來很香對不對？</p>
+            <p><span class="sound-effect">（罐頭音效：烏鴉飛過… 啊… 啊… 啊…）</span> -> <span class="sound-effect">（老張：喂！這音效不對吧！）</span></p>
+        </section>
+
+        <section id="cla-basics">
+            <h2>第一章：CLA 你哪位？基本盤點一下</h2>
+            <p><strong>老張：</strong>「好，概念懂了，接下來就是最噁心的部分了：你怎麼叫這個書呆子開始工作？你以為遞張紙條給他就行了？太天真了。你需要一套完整的SOP，從幫他劃定辦公區域、給他工作手冊、到教他怎麼看懂門口的提示燈。這就是我們今天要搞的，CLA 的初始化流程。你筆記本拿出來，接下來我說的每個字，都可能是你未來加班到半夜時，能救你一命的救命毫毛。」</p>
+            <h3>獨立自主的山大王</h3>
+            <p>它有自己的一套架構，跟 C28x CPU 各玩各的，但又能緊密合作。它有自己的：</p>
+            <ul>
+                <li>它幾乎是一個獨立的CPU功能</li>
+            </ul>
+            <h3>數學小天才</h3>
+            <p>它的指令集可是專為控制演算法設計的，包含：</p>
+            <ul>
+                <li>IEEE 單精度 (32位元) 浮點運算 —— 精度夠用，速度又快。</li>
+                <li>浮點運算可以跟並行載入/儲存一起做 —— 一心二用，省時間！</li>
+                <li>浮點乘法可以跟並行加法/減法一起做 —— 連擊技啊！</li>
+                <li>1/X 跟 1/sqrt(X) 的估算指令 —— 算倒數、開根號倒數，快又有效。</li>
+                <li>資料型態轉換、條件跳躍、條件呼叫、資料載入/儲存 —— 基本款該有都有。</li>
+            </ul>
+            <h3>多工處理小能手</h3>
+            <p>CLA 最多可以處理八個獨立的「任務 (Task)」。你可以把它想像成 CLA 有八個專案可以同時接，但一次只做一個專案裡的一件事。</p>
+            <ul>
+                <li>每個任務的起始位址由 <code>MVECT</code> 相關暫存器指定。</li>
+                <li>任務完成時，會在 PIE (Peripheral Interrupt Expansion) 模組裡插旗子，告訴 CPU：「林北做完啦！」</li>
+                <li>一個任務做完，如果還有其他任務在排隊，CLA 會自動去撿優先權最高的來做。</li>
+                <li><strong>Type-2 CLA 更猛</strong>：它可以有一個「背景任務」持續跑，然後其他高優先權的事件可以插隊進來變成「前景任務」。背景任務就像是打掃阿姨一直在清潔，突然有貴賓來了，就先服務貴賓。</li>
+            </ul>
+             <div class="pitfall">
+                <strong>老張：</strong>「CLA 的任務是有優先權的。Task 1 優先權最高，Task 8 最低。如果 Task 2 正在執行，這時候觸發 Task 1 的信號來了，CLA 會不會放下手邊的工作，先去做 Task 1？答案是：不會！CLA 的任務是『不可嵌套』的（除非用 Type-2 CLA 的背景任務）。意思就是，書呆子一次只會專心做一件事，做完之前，天塌下來他都不會理你。搞不清楚這一點，你可能會發現為什麼你最高優先權的任務有時候會延遲。」
+            </div>
+            <h3>叫醒服務（任務觸發機制）</h3>
+            <ul>
+                <li>C28x CPU 可以用 <code>IACK</code> 指令強迫 CLA 開始某個任務。</li>
+                <li>周邊硬體，比如 ADC 轉換完成、ePWM 事件，可以觸發 Task1 到 Task8。總共最多可以有 256 個觸發源，夠你玩了吧？</li>
+                <li>Task8 可以設定成背景任務，而 Task1 到 Task7 就負責處理周邊觸發。</li>
+            </ul>
+             <h3>記憶體三劍客：劃地盤</h3>
+            <p><strong>老張：</strong>「這是所有新手的第一个天坑，也是最大的坑。你記住，CLA 跟主CPU雖然在同一顆晶片上，但他們預設是老死不相往來的。他們共用一些叫做 <strong>LSxRAM</strong> 的記憶體區塊，你可以把它想像成辦公室裡的幾塊共用大白板。」</p>
+            <ul>
+                <li><strong>CLA 程式記憶體 (Program Memory)</strong>：通常是晶片上的 LSxRAM。CPU 先把 CLA 的程式碼複製進去，然後把這塊記憶體的使用權交給 CLA。CLA 會從這裡抓指令來執行。
+                    <p><strong>老張：</strong>「這一步通常在你的主程式初始化函式裡面做，比如用 <code>memcpy</code> 之類的指令，把儲存在 Flash 裡面的 CLA 程式，複製到 RAM 裡面。為什麼要複製？因為 CLA 這書呆子動作太快，他沒空去慢吞吞的 Flash 裡面拿資料，他只看 RAM 裡的東西。」</p>
+                </li>
+                <li><strong>CLA 資料記憶體 (Data Memory)</strong>：也是 LSxRAM。CPU 先把 CLA 運算要用的常數、係數表、資料緩衝區準備好，然後把記憶體使用權交給 CLA。</li>
+                <li><strong>訊息 RAM (Message RAMs)</strong>：這是 CLA 跟 CPU 之間互通有無的「聯絡簿」。有兩塊：
+                    <ul>
+                        <li>CLA to CPU Message RAM：CLA 寫，CPU 讀。CLA 把算好的結果丟這裡。</li>
+                        <li>CPU to CLA Message RAM：CPU 寫，CLA 讀。CPU 要丟新參數給 CLA 就靠它。</li>
+                    </ul>
+                    <p><strong>老張：</strong>「記住這個許可權，寫反了？沒事，系統會直接忽略你的寫入操作，但你就會在那裡抓破頭想說為什麼你的資料一直沒更新。這就是第二個坑：搞不清楚誰能寫哪個信箱。」</p>
+                    <div class="laozhang-tip">注意：訊息 RAM 只能放資料，不能放程式碼！</div>
+                </li>
+            </ul>
+        </section>
+
+        <section id="cla-sop">
+            <h2>第二章：CLA 上工啦！標準作業流程 (SOP)</h2>
+            <p><strong>老張：</strong>「好，地盤劃好了，信箱也準備好了。第二步：撰寫工作手冊，也就是 CLA 程式碼。... 第六步：開綠燈，啟用中斷。我們回顧一下：」</p>
+            <p>這個初始化流程，基本上都是由 C28x 主 CPU 來完成的。菜鳥們，筆記本拿出來，這段 SOP 很重要，搞錯一步，CLA 就躺平給你看，到時候 debug 到天荒地老，別說我沒提醒你！</p>
+            <ol>
+                <li>
+                    <strong>步驟一：把 CLA 的程式碼「搬家」到 CLA 程式記憶體</strong>
+                    <p>你寫好的 CLA 程式，CPU 的任務就是把它複製到指定的 LSxRAM 區塊。</p>
+                    <span class="newbie-os">菜鳥OS：「為什麼不直接讓 CLA 從 Flash 讀？」</span>
+                    <p><strong>老張：</strong>「傻孩子，Flash 比較慢啊！CLA 這種急驚風，當然要用 RAM 才跑得快！」</p>
+                </li>
+                <li>
+                    <strong>步驟二：（如果需要的話）初始化 CLA 資料記憶體</strong>
+                    <p>如果你的 CLA 程式需要一些預設的常數、查找表、或是初始化的資料緩衝區，CPU 也要把它們填到指定的 LSxRAM 區塊。</p>
+                </li>
+                <li>
+                    <strong>步驟三：設定 CLA 的相關暫存器（但先別急著開中斷！）</strong>
+                    <p>這個步驟最繁瑣，但也最關鍵。就像幫新員工設定電腦權限一樣。</p>
+                    <ul>
+                        <li><strong>3a. 啟用 CLA 的周邊時脈 (Peripheral Clock)</strong>：找到對應的 <code>PCLKCRn</code> 暫存器，把 CLA 的時脈打開。</li>
+                        <li><strong>3b. 填寫 CLA 任務的中斷向量 (Interrupt Vectors)</strong>：CLA 有八個任務，每個任務都有一個對應的向量暫存器，從 <code>MVECT1</code> 到 <code>MVECT8</code>。要把每個 CLA 任務程式的起始位址填到對應的 <code>MVECTx</code>。
+                            <p><strong>老張：</strong>「這樣，當 Task 1 被觸發時，CLA 就會去看 <code>MVECT1</code> 裡面的地址，然後跑到那個地址開始讀取指令。如果你忘了設，或是設錯了，CLA 就會跑到一個鳥不生蛋的地方去執行程式，後果你懂的。這是第五個坑。」</p>
+                        </li>
+                        <li><strong>3c. 選擇任務的中斷觸發源 (Interrupt Sources)</strong>：設定 <code>DmaClaSrcSelRegs.CLA1TASKSRCSELx[TASKx]</code>，告訴 CLA 哪個周邊事件對應到哪個任務。
+                            <p><strong>老張：</strong>「要做到這點，你需要設定一個叫做 <code>DmaClaSrcSelRegs</code> 的暫存器。這名字很長，但你拆開看：DMA CLA Source Select Registers。你可以把它想像成一個總機接線板...你就在這個接線板上，用跳線把『ADC A 中斷 1』連到『CLA Task 1』。這個『跳線號碼牌』就是你要填到暫存器裡的值。每個號碼牌對應一個特定的周邊中斷源。這些號碼牌寫在哪？當然是在你那本比磚頭還厚的 TRM (Technical Reference Manual) 裡面啦！你以為我會背給你聽？自己去翻，查那個 CLA 章節裡的『Configuration Options』表格，通常是 Table 7-1 那一大串！」</p>
+                            <div class="laozhang-tip">TRM 是你的好朋友：具體哪個周邊對應哪個選擇值，請務必查閱 TRM 裡的 CLA 觸發源列表 (通常是 Table 7-1)。</div>
+                            <p><strong>老張：</strong>「喏，怕你懶得翻，我把那張落落長的『CLA 任務召喚獸對照表』貼給你看。這張表就是告訴你，你要讓哪個周邊的哪個事件去叫醒 CLA 的哪個任務，你就要在 <code>DmaClaSrcSelRegs.CLA1TASKSRCSELx[TASKx]</code> 這個暫存器裡面填上對應的『Select Value』。看清楚啦，這可是考試重點！」</p>
+                            <div class="table-container">
+                                <table>
+                                    <thead>
+                                        <tr>
+                                            <th>Select Value</th>
+                                            <th>CLA Trigger Source</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr><td>0</td><td>CLA_SOFTWARE_TRIGGER</td></tr>
+                                        <tr><td>1</td><td>ADCAINT1</td></tr>
+                                        <tr><td>2</td><td>ADCAINT2</td></tr>
+                                        <tr><td>3</td><td>ADCAINT3</td></tr>
+                                        <tr><td>4</td><td>ADCAINT4</td></tr>
+                                        <tr><td>5</td><td>ADCA_EVT_INT</td></tr>
+                                        <tr><td>6</td><td>ADCBINT1</td></tr>
+                                        <tr><td>7</td><td>ADCBINT2</td></tr>
+                                        <tr><td>8</td><td>ADCBINT3</td></tr>
+                                        <tr><td>9</td><td>ADCBINT4</td></tr>
+                                        <tr><td>10</td><td>ADCB_EVT_INT</td></tr>
+                                        <tr><td>11</td><td>ADCCINT1</td></tr>
+                                        <tr><td>12</td><td>ADCCINT2</td></tr>
+                                        <tr><td>13</td><td>ADCCINT3</td></tr>
+                                        <tr><td>14</td><td>ADCCINT4</td></tr>
+                                        <tr><td>15</td><td>ADCC_EVT_INT</td></tr>
+                                        <tr><td>16-28</td><td>Reserved</td></tr>
+                                        <tr><td>29</td><td>XINT1</td></tr>
+                                        <tr><td>30</td><td>XINT2</td></tr>
+                                        <tr><td>31</td><td>XINT3</td></tr>
+                                        <tr><td>32</td><td>XINT4</td></tr>
+                                        <tr><td>33</td><td>XINT5</td></tr>
+                                        <tr><td>34-35</td><td>Reserved</td></tr>
+                                        <tr><td>36</td><td>EPWM1_INT</td></tr>
+                                        <tr><td>37</td><td>EPWM2_INT</td></tr>
+                                        <tr><td>38</td><td>EPWM3_INT</td></tr>
+                                        <tr><td>39</td><td>EPWM4_INT</td></tr>
+                                        <tr><td>40</td><td>EPWM5_INT</td></tr>
+                                        <tr><td>41</td><td>EPWM6_INT</td></tr>
+                                        <tr><td>42</td><td>EPWM7_INT</td></tr>
+                                        <tr><td>43</td><td>EPWM8_INT</td></tr>
+                                        <tr><td>44</td><td>EPWM9_INT</td></tr>
+                                        <tr><td>45</td><td>EPWM10_INT</td></tr>
+                                        <tr><td>46</td><td>EPWM11_INT</td></tr>
+                                        <tr><td>47</td><td>EPWM12_INT</td></tr>
+                                        <tr><td>48</td><td>EPWM13_INT</td></tr>
+                                        <tr><td>49</td><td>EPWM14_INT</td></tr>
+                                        <tr><td>50</td><td>EPWM15_INT</td></tr>
+                                        <tr><td>51</td><td>EPWM16_INT</td></tr>
+                                        <tr><td>52</td><td>MCANA_FEVT0</td></tr>
+                                        <tr><td>53</td><td>MCANA_FEVT1</td></tr>
+                                        <tr><td>54</td><td>MCANA_FEVT2</td></tr>
+                                        <tr><td>55</td><td>MCANB_FEVT0</td></tr>
+                                        <tr><td>56</td><td>MCANB_FEVT1</td></tr>
+                                        <tr><td>57</td><td>MCANB_FEVT2</td></tr>
+                                        <tr><td>58</td><td>EPWM17_INT</td></tr>
+                                        <tr><td>59</td><td>EPWM18_INT</td></tr>
+                                        <tr><td>60-67</td><td>Reserved</td></tr>
+                                        <tr><td>68</td><td>CPU_TINT0</td></tr>
+                                        <tr><td>69</td><td>CPU_TINT1</td></tr>
+                                        <tr><td>70</td><td>CPU_TINT2</td></tr>
+                                        <tr><td>71-74</td><td>Reserved</td></tr>
+                                        <tr><td>75</td><td>ECAP1_INT</td></tr>
+                                        <tr><td>76</td><td>ECAP2_INT</td></tr>
+                                        <tr><td>77</td><td>ECAP3_INT</td></tr>
+                                        <tr><td>78</td><td>ECAP4_INT</td></tr>
+                                        <tr><td>79</td><td>ECAP5_INT</td></tr>
+                                        <tr><td>80</td><td>ECAP6_INT</td></tr>
+                                        <tr><td>81</td><td>ECAP7_INT</td></tr>
+                                        <tr><td>82</td><td>Reserved</td></tr>
+                                        <tr><td>83</td><td>EQEP1_INT</td></tr>
+                                        <tr><td>84</td><td>EQEP2_INT</td></tr>
+                                        <tr><td>85</td><td>EQEP3_INT</td></tr>
+                                        <tr><td>86</td><td>EQEP4_INT</td></tr>
+                                        <tr><td>87</td><td>EQEP5_INT</td></tr>
+                                        <tr><td>88</td><td>EQEP6_INT</td></tr>
+                                        <tr><td>89-91</td><td>Reserved</td></tr>
+                                        <tr><td>92</td><td>ECAP6_INT2</td></tr>
+                                        <tr><td>93</td><td>ECAP7_INT2</td></tr>
+                                        <tr><td>94</td><td>Reserved</td></tr>
+                                        <tr><td>95</td><td>SD1_ERRINT</td></tr>
+                                        <tr><td>96</td><td>SD2_ERRINT</td></tr>
+                                        <tr><td>97</td><td>SD3_ERRINT</td></tr>
+                                        <tr><td>98</td><td>SD4_ERRINT</td></tr>
+                                        <tr><td>99</td><td>LINA_INT1</td></tr>
+                                        <tr><td>100</td><td>LINA_INT0</td></tr>
+                                        <tr><td>101</td><td>LINB_INT1</td></tr>
+                                        <tr><td>102</td><td>LINB_INT0</td></tr>
+                                        <tr><td>103</td><td>ECAT_SYNC0</td></tr>
+                                        <tr><td>104</td><td>ECAT_SYNC1</td></tr>
+                                        <tr><td>105</td><td>PMBUSA_INT</td></tr>
+                                        <tr><td>106-108</td><td>Reserved</td></tr>
+                                        <tr><td>109</td><td>SPIA_TXINT</td></tr>
+                                        <tr><td>110</td><td>SPIA_RXINT</td></tr>
+                                        <tr><td>111</td><td>SPIB_TXINT</td></tr>
+                                        <tr><td>112</td><td>SPIB_RXINT</td></tr>
+                                        <tr><td>113</td><td>SPIC_TXINT</td></tr>
+                                        <tr><td>114</td><td>SPIC_RXINT</td></tr>
+                                        <tr><td>115</td><td>SPID_TXINT</td></tr>
+                                        <tr><td>116</td><td>SPID_RXINT</td></tr>
+                                        <tr><td>117</td><td>CLB5_INT</td></tr>
+                                        <tr><td>118</td><td>CLB6_INT</td></tr>
+                                        <tr><td>119-120</td><td>Reserved</td></tr>
+                                        <tr><td>121</td><td>CLA_INTERRUPT1</td></tr>
+                                        <tr><td>122</td><td>Reserved</td></tr>
+                                        <tr><td>123</td><td>FSITXA_INT1</td></tr>
+                                        <tr><td>124</td><td>FSITXA_INT2</td></tr>
+                                        <tr><td>125</td><td>FSIRXA_INT1</td></tr>
+                                        <tr><td>126</td><td>FSIRXA_INT2</td></tr>
+                                        <tr><td>127</td><td>CLB1_INT</td></tr>
+                                        <tr><td>128</td><td>CLB2_INT</td></tr>
+                                        <tr><td>129</td><td>CLB3_INT</td></tr>
+                                        <tr><td>130</td><td>CLB4_INT</td></tr>
+                                        <tr><td>131-142</td><td>Reserved</td></tr>
+                                        <tr><td>143</td><td>SD1FLT1_DRINT</td></tr>
+                                        <tr><td>144</td><td>SD1FLT2_DRINT</td></tr>
+                                        <tr><td>145</td><td>SD1FLT3_DRINT</td></tr>
+                                        <tr><td>146</td><td>SD1FLT4_DRINT</td></tr>
+                                        <tr><td>147</td><td>SD2FLT1_DRINT</td></tr>
+                                        <tr><td>148</td><td>SD2FLT2_DRINT</td></tr>
+                                        <tr><td>149</td><td>SD2FLT3_DRINT</td></tr>
+                                        <tr><td>150</td><td>SD2FLT4_DRINT</td></tr>
+                                        <tr><td>151</td><td>SD3FLT1_DRINT</td></tr>
+                                        <tr><td>152</td><td>SD3FLT2_DRINT</td></tr>
+                                        <tr><td>153</td><td>SD3FLT3_DRINT</td></tr>
+                                        <tr><td>154</td><td>SD3FLT4_DRINT</td></tr>
+                                        <tr><td>155</td><td>FSITXB_INT1</td></tr>
+                                        <tr><td>156</td><td>FSITXB_INT2</td></tr>
+                                        <tr><td>157</td><td>FSIRXB_INT1</td></tr>
+                                        <tr><td>158</td><td>FSIRXB_INT2</td></tr>
+                                        <tr><td>159</td><td>FSIRXC_INT1</td></tr>
+                                        <tr><td>160</td><td>FSIRXC_INT2</td></tr>
+                                        <tr><td>161</td><td>FSIRXD_INT1</td></tr>
+                                        <tr><td>162</td><td>FSIRXD_INT2</td></tr>
+                                        <tr><td>163-183</td><td>Reserved</td></tr>
+                                        <tr><td>184</td><td>DMA_CH1INT</td></tr>
+                                        <tr><td>185</td><td>DMA_CH2INT</td></tr>
+                                        <tr><td>186</td><td>DMA_CH3INT</td></tr>
+                                        <tr><td>187</td><td>DMA_CH4INT</td></tr>
+                                        <tr><td>188</td><td>DMA_CH5INT</td></tr>
+                                        <tr><td>189</td><td>DMA_CH6INT</td></tr>
+                                        <tr><td>190-201</td><td>Reserved</td></tr>
+                                        <tr><td>202</td><td>SD4FLT1_DRINT</td></tr>
+                                        <tr><td>203</td><td>SD4FLT2_DRINT</td></tr>
+                                        <tr><td>204</td><td>SD4FLT3_DRINT</td></tr>
+                                        <tr><td>205</td><td>SD4FLT4_DRINT</td></tr>
+                                        <tr><td>206-255</td><td>Reserved</td></tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                            <div class="pitfall">
+                                <strong>老張：</strong>「CLA 任務觸發是對「邊緣 (edge)」敏感的，不是對「電位 (level)」。如果周邊中斷在你設定 CLA 之前就已經發生而且卡在那裡，CLA 可能會收不到那個邊緣觸發！所以，保險起見，先設定好 CLA，再啟用周邊中斷，或者在啟用 CLA 任務前，先清除周邊的待處理中斷旗標。這是第六個坑，多少英雄好漢在這裡翻船。」
+                            </div>
+                        </li>
+                        <li><strong>3d. （如果需要軟體觸發）啟用 IACK 功能</strong>：若想讓 CPU 用 <code>IACK</code> 指令來啟動 CLA 任務，記得要把 <code>MCTL</code> 暫存器裡的 <code>IACKE</code> 位元設起來。</li>
+                        <li>
+                            <strong>3e. 把 CLA 資料記憶體映射到 CLA 空間</strong>：
+                            <p><strong>老張：</strong>「接下來，你要做一個非常重要的動作：『交出所有權』。你要對著記憶體控制器大喊：『嘿！從現在開始，這幾塊白板，是給 CLA 專用的了！我主CPU沒事不會去亂碰！』這個『喊話』的動作，就是去設定幾個特殊的暫存器。<code>LSxMSEL</code> 跟 <code>LSxCLAPGM</code>。」</p>
+                            首先，寫入記憶體組態暫存器 <code>MemCfgRegs.LSxMSEL[MSEL_LSx]</code> 位元為 1。然後，寫入 <code>MemCfgRegs.LSxCLAPGM[CLAPGM_LSx]</code> 位元為 0 (資料記憶體)。
+                        </li>
+                        <li>
+                            <strong>3f. 把 CLA 程式記憶體映射到 CLA 空間</strong>：
+                            一樣，先寫 <code>MemCfgRegs.LSxMSEL[MSEL_LSx]</code> 為 1。然後，重點來了，要寫 <code>MemCfgRegs.LSxCLAPGM[CLAPGM_LSx]</code> 為 1 (程式記憶體)。
+                            <div class="pitfall">
+                                <strong>老張：</strong>「標準流程是：主CPU先把 CLA 的程式碼搬到某個 LSxRAM (如 LS0RAM)，資料搬到另一個 LSxRAM (如 LS1RAM)。然後設 LS0RAM 的 <code>LS0MSEL=1</code>, <code>LS0CLAPGM=1</code>。再去設 LS1RAM 的 <code>LS1MSEL=1</code>, <code>LS1CLAPGM=0</code>。搞混了會怎樣？呵呵，輕則 CLA 罷工，重則『程式跑飛』，那時候你只能拔電源了。」
+                            </div>
+                        </li>
+                    </ul>
+                    <div class="laozhang-tip">重要提醒：在整個初始化流程中，CLA 的主中斷致能 (<code>MIER</code> 暫存器) 最好先全部清成 0。等所有東西都設定妥當了，最後才打開。</div>
+                </li>
+                <li>
+                    <strong>步驟四：初始化 PIE 向量表和相關暫存器</strong>
+                    <p>當 CLA 完成一個任務時，它會在 PIE 模組產生一個對應的中斷訊號給 CPU。CPU 這邊也要設定好 PIE。</p>
+                </li>
+                <li>
+                    <strong>步驟五：啟用 CLA 任務/中斷 (寫 MIER 暫存器)</strong>
+                    <p><strong>老張：</strong>「萬事俱備，只欠東風。最後一步，就是走到 CLA 辦公室門口，把「允許打擾」的牌子掛上去。這個動作是設定 <code>MIER</code> (Interrupt Enable Register) 暫存器。你把對應 Task 1 的位元設成 1，才算是真正啟用了這個任務的中斷。」</p>
+                </li>
+                <li>
+                    <strong>步驟六：初始化其他會觸發 CLA 任務的周邊</strong>
+                    <p>例如，如果你設定 ADC 轉換完成後觸發 CLA 任務，那就要去設定 ADC 的相關參數、啟用 ADC 中斷等等。</p>
+                </li>
+            </ol>
+            <p><strong>老張：</strong>「做完這些，你的主CPU就可以去泡茶看報紙了（當然是開玩笑的，你還有別的活要幹），CLA 就會像個忠誠的僕人一樣，在背景幫你處理那些高速迴路。」</p>
+        </section>
+
+        <section id="cla-programming">
+            <h2>第三章：CLA 程式怎麼寫？C 語言嘛ㄟ通！</h2>
+            <p><strong>老張：</strong>「CLA 有自己的一套指令集，是專為數學運算優化的。你可以用組合語言來寫，如果你想體驗一下石器時代工程師的快感。但現在都什麼年代了，TI 早就提供了 CLA 的 C 編譯器。你可以用 C 語言的一個子集來寫 CLA 的程式。」</p>
+            <p>你只要建立一個 <code>.cla</code> 結尾的檔案，然後在裡面寫 C 語言函式就行了。不過，這個 C 不是你平常寫的那個萬能 C。它沒有那麼多花俏的功能，主要是做數學運算。別想在裡面搞什麼動態記憶體配置 <code>malloc</code>，或是印東西 <code>printf</code>，書呆子沒那麼多才多藝。</p>
+            <p>在你的 <code>.cla</code> 檔案裡，你會定義好幾個「任務」（Task）。CLA 最多可以有八個任務，從 Task1 到 Task8。每個任務都是一個獨立的函式，函式前面要加上 <code>__attribute__((interrupt))</code> 這個宣告。</p>
+            <pre><code class="language-c">
+__attribute__((interrupt))
+void Cla1Task1 ( void )
+{
+   // 在這裡寫你的高速控制迴路程式碼
+   // 讀取 ADC 結果
+   // 執行 PID 運算
+   // 更新 PWM 佔空比
+   __mstop(); // 告訴書呆子這件工作做完了
+}
+            </code></pre>
+            <div class="pitfall">
+                <strong>老張：</strong>「看到那個 <code>__mstop()</code> 了嗎？這非常重要！這是書呆子工作手冊的最後一頁，告訴他：『事情做完了，可以休息了。』如果你忘了加這個，他做完事之後不知道要幹嘛，就會繼續往下執行記憶體裡的垃圾數據，然後... 砰！又是『程式跑飛』套餐。這是第三個坑。」
+            </div>
+             <p>當然，如果你是個追求極致效能的硬核玩家，直接手刻 CLA 組合語言也是可以的。</p>
+        </section>
+
+        <section id="message-ram">
+            <h2>第四章：CLA 與 CPU 的「摩斯密碼」—— 訊息 RAM</h2>
+            <p>CLA 埋頭苦幹，算出結果總得讓 CPU 知道吧？CPU 有新的命令或參數要給 CLA，也得有管道啊！這時候，「訊息 RAM (Message RAMs)」就登場了。</p>
+            <ul>
+                <li><strong>CLA-to-CPU Message RAM</strong>：CLA 寫，CPU 讀。CLA 把算好的重要結果寫到這個 RAM。</li>
+                <li><strong>CPU-to-CLA Message RAM</strong>：CPU 寫，CLA 讀。CPU 要更新 CLA 的控制參數就寫到這個 RAM。</li>
+            </ul>
+            <p><strong>老張：</strong>「記住這個許可權，寫反了？沒事，系統會直接忽略你的寫入操作，但你就會在那裡抓破頭想說為什麼你的資料一直沒更新。」</p>
+        </section>
+
+        <section id="cla-pitfalls">
+            <h2>第五章：CLA 的眉眉角角 —— 避坑指南</h2>
+            <p><strong>老張：</strong>「接下來，講點進階的，也是坑中之坑：Pipeline，管線。」</p>
+            <p>好啦，基本操作你們應該有點概念了。但江湖險惡，CLA 也不是省油的燈。有些小細節沒注意，它可是會毫不留情地把你搞死。</p>
+            
+            <h3>記憶體設定，再三確認！</h3>
+            <ul>
+                <li><code>LSxMSEL</code> (記憶體擁有者) 和 <code>LSxCLAPGM</code> (程式/資料屬性) 這兩個位元，一定要設對！</li>
+                <li>忘了把記憶體所有權切給 CLA (<code>LSxMSEL=1</code>)，CLA 就讀不到它的程式和資料。</li>
+                <li><code>LSxCLAPGM</code> 設錯，CLA 也會一臉懵逼。</li>
+            </ul>
+
+            <h3>EALLOW / MEALLOW 保護機制</h3>
+            <p><strong>老張：</strong>「喔喔喔！這位同學問到重點了！EALLOW / MEALLOW 保護機制，這可是 C2000 微控制器家族，尤其是 CLA 在操作時，一個非常非常重要的「安全鎖」概念。搞不懂這個，你的程式輕則跑不動，重則把系統搞到天翻地覆，到時候老闆拿著電蚊拍追殺你，別說我沒警告過你啊！」</p>
+            <span class="sound-effect">（罐頭音效：緊張刺激的鼓點聲）</span>
+            <p>想像一下情境：你家有個保險箱，裡面放著傳家之寶（在 MCU 的世界裡，就是那些超級重要的系統控制暫存器）。平常這個保險箱是鎖上的，誰都不能亂動。</p>
+            <p><code>EALLOW</code> (Enable Write Access to EALLOW-Protected Registers)：這就像是總經理（也就是你的 C28x 主 CPU）拿出他的專用鑰匙，「喀啦」一聲，把保險箱打開了。打開之後，總經理才能修改保險箱裡的東西。</p>
+            <p><code>EDIS</code> (Disable Write Access to EALLOW-Protected Registers)：總經理修改完傳家之寶後，一定要記得<strong>「喀啦」一聲，再把保險箱鎖回去！</strong> 不然阿貓阿狗都跑進去亂搞，傳家之寶被換成狗尾巴草，你就準備回家吃自己了。</p>
+            
+            <h4>那 MEALLOW / MEDIS 又是什麼鬼？</h4>
+            <p>CLA 這位特種部隊成員，它也有自己的一把「保險箱鑰匙」！</p>
+            <p><code>MEALLOW</code> (CLA Enable Write Access to EALLOW Protected Registers)：這是 CLA 自己要動用那些受 EALLOW 保護的暫存器時，CLA 拿出它的專用鑰匙，把保險箱打開。</p>
+            <p><code>MEDIS</code> (CLA Disable Write Access to EALLOW Protected Registers)：CLA 用完之後，一樣，CLA 自己要把保險箱鎖回去！</p>
+
+            <h4>重點來了，敲黑板！</h4>
+            <p><strong>CPU 的鑰匙歸 CPU 管，CLA 的鑰匙歸 CLA 管！ 這兩套是獨立的！</strong>CPU 用 <code>EALLOW</code> 開鎖，不代表 CLA 也能寫；CLA 用 <code>MEALLOW</code> 開鎖，也不代表 CPU 就能寫。各管各的！</p>
+
+            <h4>為什麼要這麼麻煩？</h4>
+            <p>這是為了「保護」。那些系統控制暫存器，一旦設錯，整個系統可能就掰掰了。所以平常把它們鎖起來，只有在「確定要修改」的時候，才短暫地打開寫入權限，改完立刻鎖上。這樣可以大幅減少因為程式意外跑飛或是一些 bug 導致重要暫存器被錯誤修改的風險。</p>
+
+            <h4>什麼時候會用到 EALLOW / MEALLOW？</h4>
+            <p>這個問題問得好！答案是：<strong>當你要寫入那些被「EALLOW 保護」的暫存器時，就必須使用！</strong></p>
+
+            <h4>哪些暫存器是「EALLOW 保護」的呢？</h4>
+            <p>這個嘛…種類可多了！通常是那些跟系統核心功能、時脈、重置、安全、以及很多周邊模組的關鍵設定有關的暫存器。常見的例子（但不限於此，一定要查你的晶片 TRM！）：</p>
+            <ul>
+                <li><strong>系統控制相關 (System Control Registers)</strong>：
+                    <ul>
+                        <li>時脈設定暫存器 (Clock configuration registers)</li>
+                        <li>看門狗計時器設定 (Watchdog timer registers)</li>
+                        <li>低功耗模式設定 (Low-power mode registers)</li>
+                        <li>GPIO 的 MUX 設定、上拉/下拉電阻設定、輸入採樣設定等等。</li>
+                    </ul>
+                </li>
+                <li><strong>記憶體組態暫存器 (Memory Configuration Registers)</strong>：
+                    <ul>
+                        <li><code>MemCfgRegs.LSxMSEL</code> 和 <code>MemCfgRegs.LSxCLAPGM</code></li>
+                    </ul>
+                </li>
+                <li><strong>CLA 本身的控制暫存器</strong>：
+                    <ul>
+                        <li>CLA 的任務向量暫存器 (<code>MVECTx</code>, <code>MVECTBGRND</code>)</li>
+                        <li>CLA 的控制暫存器 (<code>MCTL</code>)</li>
+                        <li>CLA 的中斷相關暫存器 (<code>MIER</code>, <code>MIFRC</code>, <code>MICLR</code> 等等)</li>
+                        <li>CLA 的背景任務控制暫存器 (<code>MCTLBGRND</code>)</li>
+                        <li>CLA 的 PSA (Program Signature Analyzer) 控制暫存器 (<code>MPSACTL</code>)</li>
+                    </ul>
+                </li>
+                <li><strong>很多周邊模組的關鍵配置暫存器</strong>：
+                    <ul>
+                        <li>ePWM 模組的一些關鍵設定 (同步、死區、跳閘)</li>
+                        <li>ADC 模組的一些關鍵設定</li>
+                        <li>其他會影響整個系統運作穩定性的周邊配置</li>
+                    </ul>
+                </li>
+            </ul>
+
+            <h4>怎麼知道哪些暫存器需要 EALLOW/MEALLOW？</h4>
+            <p>答案永遠是：<strong>查閱你那顆晶片的 Technical Reference Manual (TRM)！</strong> TRM 裡面描述每個暫存器的時候，通常會標註它是否受 EALLOW 保護。如果它標示了「Write Protection: EALLOW」，那恭喜你，CPU 要寫它的時候，就得乖乖用 <code>EALLOW ... EDIS</code> 包起來。如果是 CLA 要寫入這些受 EALLOW 保護的暫存器呢？那就在你的 CLA 程式碼裡面，用 <code>MEALLOW ... MEDIS</code> 把寫入操作包起來！</p>
+
+            <h4>一個標準的 CPU 端寫入受保護暫存器的流程：</h4>
+            <pre><code class="language-c">
+// 假設我們要設定某個受 EALLOW 保護的 GPIO MUX
+// （這只是範例，具體暫存器名稱和位元請查 TRM）
+
+// 先儲存目前的 EALLOW 狀態 (好習慣，雖然不一定每次都必要)
+uint16_t eallow_status_backup = __get_EALLOW_status();
+
+EALLOW; // 打開保險箱！
+
+// 在這裡進行寫入操作
+GpioCtrlRegs.GPAMUX1.bit.GPIO0 = 1; // 假設 GPIO0 設定為某個周邊功能
+// ... 其他需要 EALLOW 保護的寫入 ...
+
+EDIS; // 鎖上保險箱！
+
+// (可選) 還原 EALLOW 狀態
+// __set_EALLOW_status(eallow_status_backup);
+// 不過通常 EDIS 就夠了，除非你有特殊巢狀需求
+            </code></pre>
+
+            <h4>一個標準的 CLA 端寫入受保護暫存器的流程 (CLA 組合語言或內嵌組合語言)：</h4>
+            <pre><code class="language-assembly">
+; 假設 CLA 要修改某個受 EALLOW 保護的 ePWM 暫存器
+; （這只是範例）
+
+    MEALLOW     ; CLA 打開保險箱！
+
+    MMOV16 @EPwm1Regs.TBCTL.bit.CTRMODE, MR0  ; 假設 MR0 裡放著要設定的計數模式
+
+    MEDIS       ; CLA 鎖上保險箱！
+            </code></pre>
+            
+            <h4>或者在 CLA C 程式碼中使用內建函式 (intrinsics)：</h4>
+            <pre><code class="language-c">
+#include &lt;intrinsics.h&gt; // 可能需要引入這個或類似的標頭檔
+
+// ... CLA C 程式碼 ...
+
+    __meallow(); // CLA 打開保險箱
+
+    // 假設 EPwm1Regs 已經被正確定義且 CLA 可以存取
+    EPwm1Regs.TBCTL.bit.CTRMODE = some_value_in_cla_register;
+
+    __medis();   // CLA 鎖上保險箱
+
+// ... CLA C 程式碼 ...
+            </code></pre>
+
+            <h4>菜鳥常犯的錯誤（也就是林北當年踩過的坑）：</h4>
+            <ul>
+                <li><strong>忘記 EALLOW/MEALLOW</strong>：這是最常見的！寫了半天，暫存器內容根本沒變。 <span class="sound-effect">（罐頭音效：撞牆聲…咚！）</span></li>
+                <li><strong>EALLOW/MEALLOW 範圍太大</strong>：在函數開頭就 <code>EALLOW</code>，結尾才 <code>EDIS</code>。這中間所有受保護暫存器都是「不設防」的。正確做法：只在你「真正要寫入受保護暫存器」的那幾行程式碼前後包起來，範圍越小越好！</li>
+                <li><strong>CPU 和 CLA 搞混</strong>：CPU 的程式用 <code>MEALLOW</code>，CLA 的程式用 <code>EALLOW</code>。鑰匙拿錯了啦！</li>
+                <li><strong>中斷服務程式 (ISR) 裡的 EALLOW</strong>：也要記得用 <code>EALLOW/EDIS</code>，但要小心 ISR 應該越快越好。</li>
+                <li><strong>讀取受保護暫存器「不需要」EALLOW/MEALLOW！</strong> 這個保護機制只針對「寫入」。</li>
+            </ul>
+
+            <h4>總結一下，EALLOW / MEALLOW 的使用時機：</h4>
+            <ul>
+                <li>當你要「寫入 (Write)」一個被標註為「EALLOW-Protected」的暫存器時。</li>
+                <li>CPU 端使用 <code>EALLOW ... EDIS</code>。</li>
+                <li>CLA 端使用 <code>MEALLOW ... MEDIS</code>。</li>
+                <li>讀取 (Read) 這些暫存器時，不需要開鎖。</li>
+                <li><strong>TRM 是你的神主牌，上面寫要保護的，你就乖乖保護！</strong></li>
+            </ul>
+            <p>這個機制雖然看起來有點囉嗦，但它是保護你系統穩定運行的重要防線。養成好習慣，該開鎖就開鎖，該鎖門就鎖門，這樣你的 CLA 和 CPU 才能合作無間，系統也才能長治久安，你才能準時下班回家打電動啦！</p>
+            <span class="sound-effect">（罐頭音效：遊戲勝利的音效）</span>
+            <p><strong>老張：</strong>「懂了沒？這個 EALLOW/MEALLOW 很重要，回去多看幾遍，把它刻在腦子裡！再忘記，下次就罰你手抄 TRM 裡所有受 EALLOW 保護的暫存器清單一百遍！哼！」</p>
+
+
+            <h3>管線 (Pipeline) 的愛恨情仇</h3>
+             <p><strong>老張：</strong>「你把 CLA 想像成一個工廠的流水線，一個指令從進來到完成，要經過好幾個站點...這也帶來了一些噁心人的『副作用』。」</p>
+            <ul>
+                <li><strong>寫後即讀 (Write Followed by Read) 到「不同」位址</strong>：
+                    <p><strong>老張：</strong>「在 CLA 的管線裡，「讀取」站點在「寫入」站點的前面...當你讀取 TBCTR 的指令進入「讀取」站點時，你那條更新 CMPA 的指令，可能還在流水線的後面晃悠，根本還沒到「寫入」站點！所以你讀到的，可能是基於舊的 CMPA 值的狀態。怎麼辦？很笨，但很有效：在寫入跟讀取之間，塞一兩個 <code>MNOP</code>（No-Operation）指令。」</p>
+                </li>
+                <li><strong>延遲條件跳躍/呼叫 (Delayed Conditional Instructions)</strong>：
+                    <p><strong>老張：</strong>「CLA 有一種條件跳轉指令，比如 <code>MBCNDD</code>...當 <code>MBCNDD</code> 這條指令在『解碼』站點判斷要不要跳的時候，它後面緊跟著的三條指令，已經被送上流水線了！所以，不管最後跳不跳，這三條指令都『一定會被執行』！這三條指令佔據的位置，就叫『延遲槽』。你絕對不能在那三條指令裡放 <code>MSTOP</code>！不然會發生什麼事？你猜。對，你的任務會在一個完全不該結束的地方結束。這是天坑中的無底洞。」</p>
+                </li>
+                <li><strong>載入輔助暫存器 (MAR0, MAR1)</strong>：載入 MARx 的指令和使用 MARx 間接定址並後修改的指令太近，可能會出包。解法：塞 <code>MNOP</code>。</li>
+            </ul>
+            <h3>中斷設定，層層把關</h3>
+            <p>要讓一個周邊觸發 CLA 任務，你需要設定好幾層：周邊本身、CLA 的 <code>DmaClaSrcSelRegs</code>、CLA 的 <code>MIER</code>，以及 CPU 端的 PIE（如果需要）。</p>
+            <h3>除錯 (Debugging) 的奇技淫巧</h3>
+            <p><strong>老張：</strong>「Debug CLA 程式碼也是一門藝術。因為 CLA 的執行是獨立的，你用傳統的方式在主CPU那邊設斷點，是斷不住 CLA 的。」</p>
+            <ul>
+                <li><strong>連接到 CLA</strong>：在 CCS (Code Composer Studio) 裡面，把除錯器的目標「連接」到 CLA。</li>
+                <li><strong>軟體中斷點</strong>：在 <code>.cla</code> 程式碼裡面，手動插入一個 <code>MDEBUGSTOP</code> 或 <code>MDEBUGSTOP1</code> 指令。
+                    <div class="laozhang-tip"><code>MDEBUGSTOP1</code> 是比較推薦的用法。</div>
+                </li>
+                <li><strong>CLA 卡在無限迴圈</strong>：
+                    <p><strong>老張：</strong>「當 CLA 在一個迴圈裡瘋狂執行時...你主CPU這邊的除錯器，有時候會連不上它...唯一的辦法，就是透過主CPU，去觸發 CLA 的軟體重置（Soft Reset）或硬體重置（Hard Reset）。在 <code>MCTL</code> 暫存器裡有這兩個位元。把它們設一下，等於是把你那個陷入死迴圈的書呆子敲暈，然後再重新開始。」</p>
+                </li>
+                <li><strong>非法指令 (Illegal Opcode)</strong>：如果 CLA 抓到看不懂的指令，它會停下來，<code>MIRUN</code> 位元會保持設定。只能重置 CLA。</li>
+            </ul>
+        </section>
+
+        <section id="cla-example">
+            <h2>第六章：一個簡單的 CLA 應用情境</h2>
+            <p>情境：ADC 即時採樣 -> 簡單濾波 -> 更新 PWM 責任週期</p>
+            <ol>
+                <li><strong>CPU 初始化階段</strong>：
+                    <ul>
+                        <li>設定 ADC (採樣、中斷作為 CLA Task1 觸發源)。</li>
+                        <li>設定 ePWM。</li>
+                        <li>設定 CLA (載入 Task1 程式碼到程式 RAM, 係數到資料 RAM, 設定 <code>MVECT1</code>, <code>DmaClaSrcSelRegs</code>, 記憶體映射, 啟用 <code>MIER.INT1</code>)。</li>
+                        <li>啟動 ADC。</li>
+                    </ul>
+                </li>
+                <li><strong>CLA 執行階段</strong> (Task1 程式)：
+                    <pre><code class="language-assembly">
+MMOVZ16 MR0, @ADCRESULTx   ; 從 ADC 結果暫存器讀值到 MR0
+; (執行濾波演算法，可能用到 MR1, MR2, MAR0, MAR1 等)
+; (根據濾波結果計算新的 PWM 責任週期值，存在 MRx)
+MEALLOW                    ; 如果 PWM 暫存器受保護
+MMOV16 @EPWMxRegs.CMPA, MRx ; 把新算出的責任週期值寫入 ePWM
+MEDIS
+MSTOP                      ; 任務結束
+                    </code></pre>
+                </li>
+            </ol>
+            <p>這個流程裡，CPU 只需要在開頭設定好所有東西，然後就可以去做其他事情了。之後 ADC 的採樣、濾波、更新 PWM，全部由 CLA 自動完成。</p>
+        </section>
+
+        <section id="cla-advanced">
+            <h2>第七章：CLA 的進階玩法</h2>
+            <p>CLA 還有很多有趣的玩法，例如：</p>
+            <ul>
+                <li><strong>背景任務 (Background Task)</strong>：讓一個比較不急的任務在背景一直跑。</li>
+                <li><strong>複雜的並行指令組合</strong>：手刻組合語言時，可以把多個數學運算和資料搬移指令巧妙地組合。</li>
+                <li><strong>CLA 觸發 DMA</strong>：CLA 也可以跟 DMA 模組合作。</li>
+            </ul>
+        </section>
+
+        <section id="cla-quick-sop" class="sop-section">
+            <h2>附錄：老張的 CLA 快速上手 SOP</h2>
+            <p>喂！菜鳥，上面講那麼多，怕你記不住。這裡給你一個濃縮版的SOP，照著做，CLA 至少能跑起來。細節還是要回去看本文跟TRM啊！</p>
+            <ol>
+                <li>
+                    <strong>撰寫 CLA 任務程式 (<code>.cla</code> 檔案)</strong>:
+                    <ul>
+                        <li>使用 C 語言子集或組合語言。</li>
+                        <li>每個任務都是一個 <code>__attribute__((interrupt))</code> 函式。</li>
+                        <li><strong>務必在任務結尾加上 <code>__mstop();</code></strong> (C 語言) 或 <code>MSTOP</code> (組合語言)。</li>
+                        <li>若需寫入受保護暫存器，使用 <code>__meallow() / __medis()</code> 或 <code>MEALLOW / MEDIS</code>。</li>
+                    </ul>
+                </li>
+                <li>
+                    <strong>主 CPU 初始化 CLA (通常在 <code>main()</code> 或初始化函式中)</strong>:
+                    <ol type="a">
+                        <li><strong>啟用 CLA 時脈</strong>: 設定 <code>PCLKCRn</code> 相關位元。</li>
+                        <li><strong>複製 CLA 程式碼與資料</strong>:
+                            <ul>
+                                <li>使用 <code>memcpy</code> 或類似方式將 CLA 程式從 Flash/連結器符號複製到指定的 LSxRAM (如 <code>Cla1ProgRAM</code>)。</li>
+                                <li>若有常數/表格，複製到指定的 LSxRAM (如 <code>Cla1DataRAM</code>)。</li>
+                            </ul>
+                        </li>
+                        <li><strong>設定記憶體映射 (Memory Mapping)</strong>:
+                            <ul>
+                                <li><strong>程式記憶體</strong>: 設定對應 LSxRAM 的 <code>MemCfgRegs.LSxMSEL = 1</code> 和 <code>MemCfgRegs.LSxCLAPGM = 1</code>。</li>
+                                <li><strong>資料記憶體</strong>: 設定對應 LSxRAM 的 <code>MemCfgRegs.LSxMSEL = 1</code> 和 <code>MemCfgRegs.LSxCLAPGM = 0</code>。</li>
+                                <li><span class="laozhang-tip">注意：這些設定通常需要 <code>EALLOW</code> 保護。</span></li>
+                            </ul>
+                        </li>
+                        <li><strong>設定 CLA 任務向量 (Interrupt Vectors)</strong>:
+                            <ul>
+                                <li>將每個 CLA 任務函式的起始位址填入對應的 <code>MVECTx</code> 暫存器 (例如：<code>MVECT1 = (uint16_t)&Cla1Task1;</code>)。</li>
+                                <li><span class="laozhang-tip"><code>MVECTx</code> 寫入通常需要 <code>EALLOW</code> 保護。</span></li>
+                            </ul>
+                        </li>
+                        <li><strong>選擇任務觸發源 (Interrupt Sources)</strong>:
+                            <ul>
+                                <li>參考上面嵌入的<strong>CLA 觸發源表格</strong>，設定 <code>DmaClaSrcSelRegs</code> 或 <code>CLAxTRGSEL</code> (依晶片型號) 將周邊中斷 (如 ADC 中斷、ePWM 中斷) 連接到 CLA 任務。</li>
+                                <li>若為軟體觸發，設定為 <code>CLA_SOFTWARE_TRIGGER</code> (Select Value = 0)。</li>
+                                <li><span class="laozhang-tip">此設定通常需要 <code>EALLOW</code> 保護。</span></li>
+                            </ul>
+                        </li>
+                        <li><strong>(可選) 啟用軟體觸發 (IACK)</strong>: 若使用 <code>IACK</code> 指令觸發 CLA，設定 <code>MCTL</code> 暫存器的 <code>IACKE</code> 位元。 (<code>MCTL</code> 寫入需 <code>EALLOW</code>)</li>
+                        <li><strong>(可選) 初始化訊息 RAM (Message RAMs)</strong>: 若 CPU 需要傳遞初始參數給 CLA。</li>
+                    </ol>
+                </li>
+                <li>
+                    <strong>啟用 CLA 任務中斷</strong>:
+                    <ul>
+                        <li>在主 CPU 端，設定 PIE 模組以允許 CLA 相關中斷送達 CPU (如果需要 CLA 完成後通知 CPU)。</li>
+                        <li><strong>最重要：設定 CLA 的 <code>MIER</code> (Interrupt Enable Register) 中對應任務的致能位元。</strong> 例如 <code>MIER.INT1 = 1</code>。</li>
+                        <li><span class="laozhang-tip"><code>MIER</code> 寫入通常需要 <code>EALLOW</code> 保護。</span></li>
+                    </ul>
+                </li>
+                <li>
+                    <strong>初始化並啟用觸發 CLA 的周邊</strong>:
+                    <ul>
+                        <li>例如，設定 ADC 轉換模式、啟用 ADC 中斷。設定 ePWM 參數、啟用 ePWM 中斷等。</li>
+                    </ul>
+                </li>
+                <li>
+                    <strong>測試與除錯</strong>:
+                    <ul>
+                        <li>在 CCS 中，連接 Debugger 到 CLA 核心。</li>
+                        <li>使用 <code>MDEBUGSTOP</code> 或 <code>MDEBUGSTOP1</code> 在 CLA 程式中設定軟體斷點。</li>
+                        <li>觀察 CLA 暫存器 (MRx, MARx, MPC, MSTF) 和記憶體內容。</li>
+                        <li>注意管線效應 (延遲槽、讀寫順序)。</li>
+                        <li>若 CLA 卡死，嘗試使用 <code>MCTL</code> 中的軟體/硬體重置位元。</li>
+                    </ul>
+                </li>
+            </ol>
+            <p><strong>老張最後囉嗦一句：</strong> 這個 SOP 是骨架，肉還是要靠你自己啃 TRM 跟範例程式碼才能長出來！加油，別被 CLA 這匹野馬甩下來！</p>
+        </section>
+
+
+        <section id="conclusion">
+            <h2>收尾：CLA 是個好東西，但你要懂得疼惜它</h2>
+            <p><strong>老張：</strong>「好了，小李。我今天說的夠多了，口水都乾了。從記憶體、程式碼、觸發、向量、啟用，到管線天坑跟除錯技巧，CLA 的精髓跟鳥事，差不多都在這裡了。」</p>
+            <p><strong>老張：</strong>「你不要覺得這東西很麻煩。它就像一匹野馬，脾氣很壞，但一旦你馴服了它，它能帶你跑得飛快。你的主CPU可以去做更多有價值的事情，而不用被困在每秒幾萬次的無盡迴圈裡。」</p>
+            <p><strong>老張：</strong>「回去把你那抖得跟帕金森一樣的馬達程式碼，用我今天教你的方法，把核心的 PID 運算部分，移植到 CLA 裡面去。做對了，你會看到你的主CPU佔用率，可能從 80% 瞬間掉到 10% 以下。那種成就感，就是我們這些搞嵌入式的，在無數個加班夜晚後，還能笑得出來的唯一理由。」</p>
+            <p>TRM (Technical Reference Manual) 是你們的聖經，遇到問題多拜讀幾遍。TI 官方也提供很多範例程式 (C2000Ware 裡面翻一下 <code>driverlib/DEVICE_GPN/examples/cla</code> 路徑)。</p>
+            <p><strong>老張：</strong>「去吧，別讓我失望。哦對了，順便幫我把茶杯洗一下。」</p>
+            <p><span class="sound-effect">（罐頭音效：掌聲 + 歡呼聲）</span></p>
+        </section>
+
+    </div>
+
+    <button id="back-to-top" title="回到頂部">&#8679;</button>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const tocContainer = document.querySelector('#toc ul');
+            const headers = document.querySelectorAll('.container h2'); // TOC still based on H2 for main sections
+            const backToTopButton = document.getElementById('back-to-top');
+
+            // Generate TOC
+            headers.forEach(header => {
+                const listItem = document.createElement('li');
+                const link = document.createElement('a');
+                link.textContent = header.textContent;
+                link.href = '#' + header.id;
+                listItem.appendChild(link);
+                tocContainer.appendChild(listItem);
+
+                // Smooth scroll for TOC links
+                link.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    document.querySelector(this.getAttribute('href')).scrollIntoView({
+                        behavior: 'smooth'
+                    });
+                    // Optional: Update active link
+                    document.querySelectorAll('#toc a').forEach(a => a.classList.remove('active'));
+                    this.classList.add('active');
+                });
+            });
+
+            // Back to Top button functionality
+            window.addEventListener('scroll', function() {
+                if (window.pageYOffset > 300) {
+                    backToTopButton.style.display = 'block';
+                } else {
+                    backToTopButton.style.display = 'none';
+                }
+
+                // Active TOC link based on scroll position (simple version for H2)
+                let currentSectionId = '';
+                const allHeadersForScrollSpy = document.querySelectorAll('.container h2'); // Use H2 for active link logic
+                allHeadersForScrollSpy.forEach(header => {
+                    const sectionTop = header.offsetTop - 120; 
+                    if (window.pageYOffset >= sectionTop) {
+                        currentSectionId = header.id;
+                    }
+                });
+
+                document.querySelectorAll('#toc a').forEach(a => {
+                    a.classList.remove('active');
+                    if (a.getAttribute('href') === '#' + currentSectionId) {
+                        a.classList.add('active');
+                    }
+                });
+
+            });
+
+            backToTopButton.addEventListener('click', function() {
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            });
+        });
+    </script>
+
+</body>
+</html>

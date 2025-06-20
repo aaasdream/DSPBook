@@ -1,0 +1,645 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>學姊的PFC避坑指南</title>
+    <style>
+        /* --- 全局樣式與深色背景 --- */
+        :root {
+            --bg-color: #212529;
+            --text-color: #f8f9fa;
+            --accent-color: #00aaff;
+            --border-color: #495057;
+            --header-bg: #343a40;
+            --code-bg: #1a1a1d;
+            --dialogue-bg: #3a3f44;
+            --senpai-accent: #ff69b4; /* 學姊的代表色 (粉紅色) */
+            --kouhai-accent: #4caf50; /* 學弟的代表色 (綠色) */
+            
+            /* Code Highlighting */
+            --code-keyword: #e673a2;
+            --code-type: #56c9b7;
+            --code-comment: #7a8b99;
+            --code-string: #a5d6a7;
+            --code-number: #f78c6c;
+            --code-function: #82aaff;
+            --code-preprocessor: #c792ea;
+        }
+
+        body {
+            font-family: 'Microsoft JhengHei', 'Segoe UI', 'Roboto', 'Helvetica Neue', Arial, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            line-height: 1.8;
+            margin: 0;
+            padding: 20px;
+            font-size: 17px;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background-color: var(--header-bg);
+            padding: 20px 40px;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+            border: 1px solid var(--border-color);
+        }
+
+        /* --- 標題與章節 --- */
+        h1, h2, h3 {
+            color: var(--accent-color);
+            border-bottom: 2px solid var(--accent-color);
+            padding-bottom: 10px;
+            font-weight: 600;
+        }
+
+        h1 {
+            text-align: center;
+            font-size: 2.5em;
+            margin-bottom: 30px;
+        }
+
+        .chapter-toggle {
+            cursor: pointer;
+            transition: color 0.3s ease;
+        }
+        
+        .chapter-toggle:hover {
+            color: #4dc3ff;
+        }
+
+        .chapter-content {
+            overflow: hidden;
+            max-height: 50000px; /* 預設展開 */
+            transition: max-height 0.7s ease-in-out;
+            padding-left: 20px;
+            border-left: 3px solid var(--border-color);
+        }
+
+        .chapter-content.collapsed {
+            max-height: 0;
+            padding-top: 0;
+            padding-bottom: 0;
+        }
+
+
+        /* --- 程式碼區塊 --- */
+        pre {
+            background-color: var(--code-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 20px;
+            overflow-x: auto;
+            font-family: 'Fira Code', 'Consolas', 'Monaco', monospace;
+            font-size: 0.9em;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }
+        
+        code {
+            font-family: 'Fira Code', 'Consolas', 'Monaco', monospace;
+        }
+
+        .keyword { color: var(--code-keyword); font-weight: bold; }
+        .type { color: var(--code-type); }
+        .comment { color: var(--code-comment); font-style: italic; }
+        .string { color: var(--code-string); }
+        .number { color: var(--code-number); }
+        .function { color: var(--code-function); }
+        .preprocessor { color: var(--code-preprocessor); }
+
+        /* --- 對話框樣式 --- */
+        .dialogue {
+            margin: 25px 0;
+            padding: 20px;
+            border-radius: 10px;
+            position: relative;
+            background-color: var(--dialogue-bg);
+        }
+
+        .senpai {
+            border-left: 5px solid var(--senpai-accent);
+        }
+        
+        .kouhai {
+             border-left: 5px solid var(--kouhai-accent);
+        }
+        
+        .dialogue .speaker {
+            font-weight: bold;
+            margin-bottom: 10px;
+            font-size: 1.1em;
+        }
+
+        .speaker.senpai-name {
+            color: var(--senpai-accent);
+        }
+        
+        .speaker.kouhai-name {
+            color: var(--kouhai-accent);
+        }
+
+        .action {
+            font-style: italic;
+            color: #adb5bd;
+            margin-bottom: 15px;
+            display: block;
+        }
+
+        /* --- 其他元素 --- */
+        strong {
+            color: var(--accent-color);
+        }
+
+        ul {
+            list-style-type: none;
+            padding-left: 20px;
+        }
+        
+        li {
+            padding-left: 20px;
+            position: relative;
+            margin-bottom: 10px;
+        }
+
+        li::before {
+            content: '⚡';
+            position: absolute;
+            left: -10px;
+            color: var(--accent-color);
+        }
+        
+        img {
+            max-width: 100%;
+            height: auto;
+            display: block;
+            margin: 20px auto;
+            border-radius: 8px;
+            background-color: #fff;
+        }
+
+        hr {
+            border: 0;
+            border-top: 2px dashed var(--border-color);
+            margin: 40px 0;
+        }
+
+        .emphasize {
+            background-color: rgba(255, 105, 180, 0.2);
+            padding: 2px 5px;
+            border-radius: 3px;
+            font-weight: bold;
+        }
+
+        .pitfall {
+            background-color: rgba(255, 0, 0, 0.2);
+            border: 1px solid rgba(255,0,0,0.5);
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 5px;
+        }
+        
+        .pitfall::before {
+            content: '🚨 大坑注意！ ';
+            font-weight: bold;
+            color: #ffc107;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>學姊的 PFC 避坑指南</h1>
+
+        <div class="dialogue senpai">
+            <span class="action">（學姊雙手抱胸，用手指輕輕敲著手臂，看著你一臉苦惱地盯著螢幕上的程式碼，忍不住嘆了口氣，嘴角卻帶著一絲藏不住的笑意。她悄悄地走到你身後，輕輕用指關節敲了敲你的頭。）</span>
+            <div class="speaker senpai-name">學姊：</div>
+            <p>喂，學弟。你這表情是看到鬼了，還是看到你的銀行戶頭了？再盯下去，螢幕都要被你燒出一個洞了。說吧，這次又是哪個小壞蛋讓你這麼頭痛？</p>
+        </div>
+
+        <div class="dialogue kouhai">
+            <span class="action">（嚇一跳，回過頭）</span>
+            <div class="speaker kouhai-name">你：</div>
+            <p>啊…學姊！沒、沒什麼啦，我只是在研究這個 PFC 的控制，感覺…感覺好複雜，不知道從哪裡下手。</p>
+        </div>
+
+        <div class="dialogue senpai">
+            <div class="speaker senpai-name">學姊：</div>
+            <p>PFC？TIDA-01606 這套是吧？哼，我就知道。你看看你，一臉「我是誰、我在哪、我的程式碼為什麼要這樣對我」的樣子。算了，誰叫我人美心善呢？今天本學姊就大發慈悲，親自下凡來普渡你這個迷途小書僮。椅子拉過來一點，聽好了啊，要是打瞌睡或是沒聽懂，我就把你的鍵盤按鍵摳下來，讓你體驗一下什麼叫真正的<span class="emphasize">『硬核』</span>編程。</p>
+            <p>講之前先說好，這東西不難，但很<strong style="color: yellow;">『繞』</strong>。你得跟著我的思路一步一步走，腦子裡要有畫面感。你要是敢直接跳著看，到時候炸了板子可別哭著來找我啊，我可沒空幫你修。聽懂了就點頭。</p>
+        </div>
+        
+        <div class="dialogue kouhai">
+             <span class="action">（你用力地點了點頭。）</span>
+        </div>
+
+        <div class="dialogue senpai">
+             <div class="speaker senpai-name">學姊：</div>
+             <p>很好，很有精神。那我們就開始吧。這是一堂<strong>『資深學姊帶你飛——TIDA-01606 PFC 控制完整避坑指南』</strong>，上課！</p>
+        </div>
+
+        <hr>
+
+        <section id="chapter-0">
+            <h2 class="chapter-toggle">第零章：腦內革命——忘掉你腦中的漿糊，我們先看大方向 ▼</h2>
+            <div class="chapter-content">
+                <p>在你一頭栽進這堆比我髮量還多的程式碼之前，先給我停下來！菜鳥最常犯的錯就是急著看 Code，結果就像沒帶地圖就跑進熱帶雨林，最後只會迷路，然後被蚊子叮到懷疑人生。</p>
+                <p>我們要先搞懂兩件事：</p>
+                <ol>
+                    <li><strong>PFC 到底想幹嘛？</strong></li>
+                    <li><strong>為了達到這個目的，我們的大策略是什麼？</strong></li>
+                </ol>
+
+                <h3>一、PFC 的終極目標：當個循規蹈矩的乖寶寶</h3>
+                <p>你聽好，電力公司最討厭什麼樣的用戶？就是那種亂七八糟、需索無度的「渣男」負載。一般的整流橋，一加上去，它從電網抽電流的樣子就像餓死鬼投胎，只在電壓最高峰的時候猛吸一口，其他時間都在擺爛。這會產生一大堆高次諧波，污染電網，功率因數低到可憐，電力公司看到這種電流波形都想順著電線爬過來打你。</p>
+                <p><strong>PFC (Power Factor Correction)，功率因數校正</strong>，它的目標很單純，就是要當個<strong>乖寶寶</strong>。它要讓我們的設備在從 AC 電網抽電的時候，抽的<strong>電流波形</strong>，跟電網的<strong>電壓波形</strong>長得<strong>一模一樣</strong>，而且<strong>相位也完全對齊</strong>。</p>
+                <p class="emphasize" style="text-align: center;">所以，記住 PFC 的核心任務：控制輸入電流，讓它完美追蹤輸入電壓的波形和相位。</p>
+
+                <h3>二、我們的作戰大策略：串級控制 (Cascade Control)</h3>
+                <p>好了，目標很明確，但怎麼做到呢？我們不能只控制電流，因為我們最終的目的是要給後面的 DC Bus 一個<strong>穩定</strong>的直流電壓啊！比如，這個案子裡是 800V。</p>
+                <p>如果負載變大了，DC Bus 電壓就會掉下去，這時候我們就得從電網多抽一點能量進來補。如果負載變小了，DC Bus 電壓會往上衝，我們就得少抽一點。</p>
+                <p>所以，這是一個雙重任務：</p>
+                <ol>
+                    <li><strong>主要任務 (慢)</strong>：維持 DC Bus 電壓穩定在 800V。</li>
+                    <li><strong>次要任務 (快)</strong>：確保抽進來的電流波形是完美的正弦波。</li>
+                </ol>
+                <p>這時候，工程師們最愛的<strong>串級控制 (Cascade Control)</strong> 就粉墨登場了。這就像你在騎重機跑山路一樣，腦子裡想的是「維持時速 60 公里過這個彎」，但你的手腳操作的是「控制油門開度和剎車力道」。</p>
+                <p>我們的 PFC 控制就是這樣一個結構：</p>
+                <ul>
+                    <li><strong>外環 (電壓環 - The Brain)</strong>：這是你的大腦。它負責看著 DC Bus 的電壓。
+                        <ul>
+                            <li><strong>輸入</strong>：目標電壓 (800V) 和實際感測到的電壓。</li>
+                            <li><strong>工作</strong>：計算兩者之間的<strong>誤差</strong>。如果實際電壓低了，它就說：「不行，能量不夠了，得加油！」；如果高了，它就說：「喂喂，能量太多了，收斂點！」</li>
+                            <li><strong>輸出</strong>：它不會直接去控制 PWM。它只會輸出一道<strong>命令</strong>，這道命令就是：「我們這次需要抽取的電流<strong>幅值</strong>是多少」。這個輸出值，就是內環的<strong>目標</strong>。</li>
+                        </ul>
+                    </li>
+                    <li><strong>內環 (電流環 - The Muscle)</strong>：這是你的手腳。它是一個反應極快的執行者。
+                        <ul>
+                            <li><strong>輸入</strong>：外環給的「電流幅值命令」，以及實際感測到的 AC 電流。</li>
+                            <li><strong>工作</strong>：它不關心 DC 電壓是多少，它只聽外環的話。它的任務就是：用盡一切手段（調整 PWM），讓實際抽進來的 AC 電流，精準地等於「外環命令的幅值」乘上「一個完美的正弦波範本」。</li>
+                            <li><strong>輸出</strong>：直接給 PWM 模組的占空比 (Duty Cycle) 命令。</li>
+                        </ul>
+                    </li>
+                </ul>
+                <p><strong>這個「完美的正弦波範本」哪裡來？</strong><br>這就是另一個關鍵技術——<strong>鎖相迴路 (PLL)</strong> 的工作了。它負責盯著電網電壓，給我們一個與電網電壓完全同步的、純淨的 <code>sin(ωt)</code> 和 <code>cos(ωt)</code> 訊號。</p>
+                <p>腦子裡有這個畫面了沒？還沒？沒關係，多想幾遍。想通了這個，你看程式碼就會像開了天眼一樣。好了，繼續下一步。</p>
+            </div>
+        </section>
+
+        <hr>
+
+        <section id="chapter-1">
+            <h2 class="chapter-toggle">第一章：藏寶圖——別亂跑，先搞懂文件放在哪 ▼</h2>
+            <div class="chapter-content">
+                <p>在你興奮地準備捲起袖子看 Code 之前，我先給你一張藏寶圖。這個專案資料夾裡有一百多個檔案，你要是每個都點開看，明年這個時候你還在這裡。</p>
+                <p>聽好，跟 PFC 控制相關的核心檔案，就這幾個，其他的你先當它們是空氣：</p>
+                <ol>
+                    <li><code>tinv_user_settings.h</code>
+                        <div class="pitfall" style="background-color: rgba(0,170,255,0.1); border-color: #00aaff;"><strong>學姊的註解：這是你的總開關、你的上帝面板！</strong> 你想跑哪個實驗 (Lab)、用什麼模式 (PFC/Inverter)、開不開保護，全都在這裡設定。改 Code 第一步，就是先來這裡看看 <code>TINV_LAB</code> 是多少。我們要看 PFC，那就要把 <code>TINV_LAB</code> 設定成 5、6 或 7。</div>
+                    </li>
+                    <li><code>tinv_p65x.h</code> / <code>tinv_p65x.c</code>
+                        <div class="pitfall" style="background-color: rgba(0,170,255,0.1); border-color: #00aaff;"><strong>學姊的註解：這是控制演算法的大腦和心臟。</strong> 所有的控制變數、PI 控制器、SPLL 物件都在這裡宣告。而那些核心的 ISR 執行函式（<code>TINV_runISR1_labX()</code>）也都在 <code>.h</code> 檔裡用 <code>inline</code> 函式的方式實現了。沒錯，寫在 <code>.h</code> 檔裡，是不是很機車？這是為了讓 C28x 和 CLA 都能呼叫，你先記著就好。</div>
+                    </li>
+                    <li><code>tinv_main.c</code>
+                        <div class="pitfall" style="background-color: rgba(0,170,255,0.1); border-color: #00aaff;"><strong>學姊的註解：這是整個程式的入口和調度中心。</strong> <code>main()</code> 函式在這裡，負責所有的初始化。最重要的，中斷服務常式 (ISR) 的<strong>殼</strong>在這裡。它就像一個接線生，根據 <code>TINV_LAB</code> 的設定，決定中斷來的時候，到底要去呼叫 <code>tinv_p65x.h</code> 裡的哪一個 <code>_labX</code> 函式。</div>
+                    </li>
+                    <li><code>tinv_hal.h</code> / <code>tinv_hal.c</code>
+                        <div class="pitfall" style="background-color: rgba(0,170,255,0.1); border-color: #00aaff;"><strong>學姊的註解：這是硬體的驅動層，是控制演算法的手和腳。</strong> 你想讀 ADC、想更新 PWM、想開關 GPIO，所有跟硬體晶片直接溝通的髒活累活，都封裝在這裡。上層的演算法只管下命令，<code>HAL</code> 層負責執行。這叫<strong>軟體分層</strong>，懂嗎？學著點。</div>
+                    </li>
+                    <li><code>libraries/</code>
+                         <div class="pitfall" style="background-color: rgba(0,170,255,0.1); border-color: #00aaff;"><strong>學姊的註解：這是 TI 送你的大禮包，是前人智慧的結晶。</strong> 裡面有 <code>DCL</code> (數位控制函式庫，PI 控制器就在這)、<code>spll</code> (鎖相迴路)、<code>transforms</code> (座標轉換) 等等。你不需要知道它裡面每一行怎麼寫的，但你必須知道<strong>怎麼用它</strong>，就像你不用知道 CPU 怎麼做的，但你會用電腦一樣。</div>
+                    </li>
+                </ol>
+                <p>好了，地圖給你了。現在，我們要開始真正的冒險了。我們要跟著訊號的流動，從感知到控制，把整個 PFC 的閉迴路走一遍。我們要看的 Lab 是 <strong>Lab 7</strong>，因為它是最完整的閉迴路 PFC 控制。</p>
+            </div>
+        </section>
+
+        <hr>
+
+        <section id="chapter-2">
+            <h2 class="chapter-toggle">第二章：PFC 的奇幻旅程——跟著訊號走一遍 ▼</h2>
+            <div class="chapter-content">
+                <p>準備好了嗎？深呼吸。我們要開始一趟從電網到 PWM 的奇幻旅程了。我會分成幾個站點，一站一站帶你走。</p>
+
+                <h3>第一站：感知 (Sensing) - 「世界那麼大，我想去看看」</h3>
+                <p>控制的第一步永遠是感知。你連現在 DC 電壓多少、AC 電流多大都不知道，還談什麼控制？那叫瞎搞。</p>
+                <ul>
+                    <li><strong>我們要看什麼？</strong>
+                        <ol>
+                            <li>三相 AC 電網電壓 (<code>Vgrid_A</code>, <code>B</code>, <code>C</code>) -> 用來給 PLL 鎖相，產生正弦波範本。</li>
+                            <li>三相 AC 輸入電流 (<code>Iinv_A</code>, <code>B</code>, <code>C</code>) -> 這是電流內環要控制的對象。</li>
+                            <li>DC Bus 電壓 (<code>Vbus</code>) -> 這是電壓外環要穩定控制的目標。</li>
+                        </ol>
+                    </li>
+                    <li><strong>在哪裡看？</strong>
+                        <p>所有這些感知的工作，都在 <code>tinv_p65x.h</code> 裡的 <code>TINV_readCurrentAndVoltageSignals()</code> 這個 <code>inline</code> 函式裡。它會在每個高速中斷裡被第一時間呼叫。</p>
+                    </li>
+                    <li><strong>程式碼解剖：</strong>
+<pre><code><span class="comment">// in tinv_p65x.h</span>
+<span class="keyword">static inline</span> <span class="type">void</span> <span class="function">TINV_readCurrentAndVoltageSignals</span>()
+{
+    <span class="comment">// 讀取三相逆變器側(其實就是輸入)電流</span>
+    TINV_iInv_A_sensed_pu = ((<span class="type">float32_t</span>)TINV_IINV_A_READ * TINV_ADC_PU_SCALE_FACTOR - TINV_iInv_A_sensedOffset_pu) * <span class="number">2.0f</span>;
+    <span class="comment">// ... B, C 相類似</span>
+
+    <span class="comment">// 讀取三相電網電壓</span>
+    TINV_vGrid_A_sensed_pu = ((<span class="type">float32_t</span>)(TINV_VGRID_A_READ - <span class="number">33</span>) * TINV_ADC_PU_SCALE_FACTOR - TINV_vGrid_A_sensedOffset_pu ) * -<span class="number">2.0f</span>;
+    <span class="comment">// ... B, C 相類似</span>
+
+    <span class="comment">// 讀取 DC Bus 電壓</span>
+    TINV_vBus_sensed_pu = ((<span class="type">float32_t</span>)TINV_VBUS_READ * TINV_ADC_PU_SCALE_FACTOR);
+}
+</code></pre>
+                    </li>
+                    <li><strong>學姊的避坑指南與碎碎念：</strong>
+                        <ol>
+                            <li><strong><code>_READ</code> 宏</strong>：你看到的 <code>TINV_IINV_A_READ</code> 這種東西，它不是一個變數，是一個宏定義，定義在 <code>tinv_user_settings.h</code> 裡，最終會展開成 <code>ADC_readResult()</code> 函式。這是為了讓程式碼看起來更乾淨（雖然有時候會讓新手更困惑，哼）。</li>
+                            <li><strong>Per-Unit (PU) - 夭壽重要的PU系統</strong>：你看到所有變數後面都有個 <code>_pu</code> 嗎？這代表 <strong>Per-Unit</strong>，也就是<strong>標么值</strong>。簡單說，就是把所有的物理量都正規化到 <code>[-1, 1]</code> 或 <code>[0, 1]</code> 的範圍內。
+                                <div class="pitfall"><strong>為什麼要用 PU？</strong> 因為可以避免在浮點數運算中處理極大或極小的數值，增加數值穩定性，而且讓 PI 控制器的參數調整變得更通用。你先接受這個設定，這是電力電子控制的慣例。</div>
+                            </li>
+                            <li><strong><code>_PU_SCALE_FACTOR</code></strong>：ADC 讀出來的是一個 0-4095 的整數，這個因子就是把它轉換成 0-1.0 的 PU 值。</li>
+                            <li class="pitfall"><strong>Offset 和奇怪的乘數/減數</strong>：你看到 <code>TINV_iInv_A_sensedOffset_pu</code> 和 <code>* 2.0f</code>、<code>- 33</code>、<code>* -2.0f</code> 這些東西了嗎？<strong>千萬別亂動！</strong> 這些是根據硬體電路的設計來的。比如感測電路可能是差動的，或者有偏置，或者訊號是反相的。這些「魔法數字」就是為了校準硬體電路，把感測到的值還原成真實的、以 0 為中心的交流訊號。這是理論跟實際硬體結合的地方，也是最多菜鳥出錯的地方。</li>
+                        </ol>
+                    </li>
+                </ul>
+
+                <h3>第二站：同步 (Synchronization) - 「跟上我的節拍！」</h3>
+                <p>好，我們拿到電壓和電流的資料了。現在電流環需要一個「正弦波範本」來追蹤。這個範本必須跟電網電壓的節拍一模一樣。這就是 <strong>PLL (鎖相迴路)</strong> 的工作。</p>
+                <ul>
+                    <li><strong>在哪裡發生？</strong>
+                        <ol>
+                            <li><code>TINV_runTransformOnSensedSignals()</code>：把感測到的 <code>abc</code> 電壓轉換成 <code>dq</code>。</li>
+                            <li><code>TINV_runSPLL()</code>：把 <code>dq</code> 電壓餵給 SPLL 演算法。</li>
+                            <li><code>TINV_runISR1_lab7()</code> 內部：從 SPLL 取出角度，計算 <code>sin</code> 和 <code>cos</code>。</li>
+                        </ol>
+                    </li>
+                    <li><strong>程式碼解剖：</strong>
+<pre><code><span class="comment">// in tinv_p65x.h, TINV_runISR1_lab7()</span>
+    
+<span class="comment">// 1. 先用【上個週期】的 sin/cos，把【這個週期】感測到的電壓轉成 dq</span>
+<span class="function">TINV_runTransformOnSensedSignals</span>(); 
+
+<span class="comment">// TINV_runTransformOnSensedSignals() 內部會呼叫：</span>
+<span class="comment">// ABC_DQ0_POS_run(&TINV_vGrid_dq0_pos, Va, Vb, Vc, TINV_sine, TINV_cosine);</span>
+
+<span class="comment">// 2. 把轉換後的 dq 電壓餵給 SPLL，讓它更新內部角度</span>
+<span class="function">TINV_runSPLL</span>(TINV_vGrid_dq0_pos.d, ..., TINV_vGrid_dq0_pos.q, ...);
+
+<span class="comment">// TINV_runSPLL() 內部會呼叫：</span>
+<span class="comment">// SPLL_3PH_SRF_run(Vq, &TINV_spll_3ph_2); -> 核心演算法</span>
+<span class="comment">// TINV_angleSPLL_radians = TINV_spll_3ph_2.theta[1]; -> 取出新角度</span>
+
+<span class="comment">// 3. 用 SPLL 算出來的【新角度】，產生【下個週期】要用的 sin/cos</span>
+TINV_sine = <span class="function">sinf</span>(TINV_angleSPLL_radians);
+TINV_cosine = <span class="function">cosf</span>(TINV_angleSPLL_radians);
+</code></pre>
+                    </li>
+                    <li><strong>學姊的避坑指南與碎碎念：</strong>
+                        <ul>
+                            <li>看到這個流程了嗎？<code>用舊角度 -> 算新資料 -> 餵給演算法 -> 產生新角度 -> 準備給下次用</code>。這就是數位控制系統的典型時序。你必須搞懂這個<strong>延遲一拍</strong>的概念。</li>
+                            <li>PLL 的 PI 參數 (<code>lpf_coeff</code>) 決定了它鎖定的快慢和穩定性。如果你的電網很乾淨，可以調得快一點；如果電網很髒、諧波多，就得調慢一點，不然 PLL 會一直抖。這個在 <code>TINV_globalVariablesInit()</code> 裡設定，沒事別亂動。</li>
+                            <li><strong>怎麼判斷 PLL 鎖好了沒？</strong> 去 Watch Window 看 <code>TINV_gridFreq_sensed_Hz</code> 是不是穩定在你電網的頻率（比如 50Hz 或 60Hz），再去看 <code>TINV_vGrid_dq0_pos.q</code> 是不是非常接近 0。如果都滿足，恭喜你，你的系統跟電網「看對眼」了。</li>
+                        </ul>
+                    </li>
+                </ul>
+                
+                <h3>第三站：電壓外環 (The Brain's Decision) - 「指令來了！」</h3>
+                 <p>PLL 已經幫我們跟上了電網的節拍。現在，大腦（電壓環）要開始做決策了。它的目標是維持 DC Bus 電壓穩定。</p>
+                <ul>
+                    <li><strong>在哪裡發生？</strong>
+                        <p>這段程式碼只在閉迴路 PFC 模式 (Lab 7) 下才會執行，就在 <code>TINV_runISR1_lab7()</code> 裡面。</p>
+                    </li>
+                    <li><strong>程式碼解剖：</strong>
+<pre><code><span class="comment">// in tinv_p65x.h, TINV_runISR1_lab7()</span>
+
+<span class="comment">// 只有在收到閉合電壓環的指令後才執行</span>
+<span class="keyword">if</span>(TINV_closeGvLoop == <span class="number">1</span>)
+{
+     <span class="comment">// ... (省略電壓參考值的斜坡緩升邏輯)</span>
+
+    <span class="comment">// 核心！執行電壓環的 PI 控制器</span>
+    <span class="comment">// 它的目標是讓 TINV_vBus_sensed_pu == TINV_vBusRefSlewed_pu</span>
+    <span class="preprocessor">#if</span> TINV_SFRA_TYPE == TINV_SFRA_VOLTAGE
+    <span class="comment">// ... SFRA 相關，先忽略</span>
+    <span class="preprocessor">#else</span>
+    TINV_gv_vBus_out = <span class="function">TINV_GV_RUN</span>(&TINV_gv_vBus,
+                                   TINV_vBusRefSlewed_pu,  <span class="comment">// 目標電壓 (PU)</span>
+                                   TINV_vBus_sensed_pu);   <span class="comment">// 實際電壓 (PU)</span>
+    <span class="preprocessor">#endif</span>
+
+    <span class="comment">// 核心中的核心！把電壓環的輸出變成電流環的參考值</span>
+    <span class="comment">// a.k.a. 把大腦的決策，變成手腳的執行目標</span>
+    TINV_idRef_pu = -<span class="number">1.0f</span> * TINV_gv_vBus_out;
+}
+<span class="keyword">else</span>
+{
+    <span class="comment">// 如果電壓環沒閉合，就給一個預設的電流參考值</span>
+    TINV_idRef_pu = -<span class="number">1.0f</span> * TINV_IREF_DEFAULT;
+    TINV_firstTimeGvLoop = <span class="number">1</span>; <span class="comment">// 重置標誌位</span>
+}
+</code></pre>
+                    </li>
+                     <li><strong>學姊的避坑指南與碎碎念：</strong>
+                        <ol>
+                            <li><strong><code>TINV_closeGvLoop</code></strong>：這是你在 Watch Window 裡手動設定的「開關」。在實際產品中，它會由一個更高層的狀態機來自動控制。這給你一個手動介入的機會，非常重要。</li>
+                            <li><strong><code>TINV_vBusRefSlewed_pu</code></strong>：你看到 <code>Slewed</code> 這個詞了嗎？這代表「斜坡」。它不會讓目標電壓瞬間從 0 跳到 800V，而是會慢慢地、平滑地爬升上去。直接跳變會導致電流衝擊，板子可能會跟你說掰掰。這是保護機制的體現。</li>
+                            <li><strong><code>TINV_GV_RUN</code></strong>：這就是 TI 的 DCL 函式庫裡的 PI 控制器。<code>GV</code> 代表 Grid Voltage loop。</li>
+                            <li class="pitfall"><strong>最重要的 <code>-1.0f</code></strong>：學弟，你看這個 <code>-1.0f</code>。為什麼是負的？因為在 <code>dq</code> 座標系的定義下，<code>Id</code> 為正代表能量從 DC 往 AC 流（逆變器）。我們現在是 PFC，要從 AC 往 DC 抽能量，所以電流方向要反過來，因此 <code>Id</code> 的參考值必須是<strong>負的</strong>。電壓 PI 控制器 <code>TINV_gv_vBus_out</code> 算出來的是一個正的「能量需求量」，所以要乘上 -1，變成負的電流指令。搞混了這個正負號，你的 PFC 就會變成一個「反向 PFC」，拼命把 DC 的能量往 AC 送，然後 DC 電壓瞬間崩潰。<strong>記住，這是個大坑！</strong></li>
+                        </ol>
+                    </li>
+                </ul>
+
+                <h3>第四站：電流內環 (The Muscle's Action) - 「收到命令，開始執行！」</h3>
+                <p>大腦已經下達了「需要多大電流」的命令 (<code>TINV_idRef_pu</code>)。現在，手腳（電流環）要開始幹活了。它的目標很單純：讓實際的 AC 輸入電流，精準地追蹤這個命令。</p>
+                <ul>
+                    <li><strong>在哪裡發生？</strong>
+                        <p><code>tinv_p65x.h</code> 裡的 <code>TINV_runCurrentLoop()</code> 函式。</p>
+                    </li>
+                    <li><strong>程式碼解剖：</strong>
+<pre><code><span class="comment">// in tinv_p65x.h</span>
+<span class="keyword">static inline</span> <span class="type">void</span> <span class="function">TINV_runCurrentLoop</span>()
+{
+    <span class="keyword">if</span>(TINV_closeGiLoop == <span class="number">1</span>) <span class="comment">// 電流環閉合開關</span>
+    {
+        <span class="comment">// 執行 d 軸電流的 PI 控制器</span>
+        TINV_gi_id_out = <span class="function">TINV_GI_RUN</span>(&TINV_gi_id,
+                                     TINV_idRef_pu,        <span class="comment">// 目標 d 軸電流 (來自電壓環)</span>
+                                     TINV_iInv_dq0_pos.d); <span class="comment">// 實際 d 軸電流</span>
+
+        <span class="comment">// 執行 q 軸電流的 PI 控制器 (通常目標是 0，為了單位功率因數)</span>
+        TINV_gi_iq_out = <span class="function">TINV_GI_RUN</span>(&TINV_gi_iq, 
+                                     TINV_iqRef_pu,        <span class="comment">// 目標 q 軸電流 (通常是 0)</span>
+                                     TINV_iInv_dq0_pos.q); <span class="comment">// 實際 q 軸電流</span>
+
+        <span class="comment">// 解耦合與前饋補償</span>
+        <span class="comment">// 這一大坨數學是為了補償系統中的交叉耦合效應和電網電壓的影響</span>
+        <span class="comment">// 讓 d 軸和 q 軸的控制更獨立、更精準</span>
+        TINV_vdInv_pu = (TINV_gi_id_out + ... - ...) / ...;
+        TINV_vqInv_pu = (TINV_gi_iq_out + ... + ...) / ...;
+        
+        <span class="comment">// ... (輸出限幅)</span>
+    }
+}
+</code></pre>
+                    </li>
+                     <li><strong>學姊的避坑指南與碎碎念：</strong>
+                        <ul>
+                            <li><strong><code>TINV_closeGiLoop</code></strong>：同樣是你在 Watch Window 裡控制的開關。標準流程是：先閉合電流環 (<code>TINV_closeGiLoop=1</code>)，確認電流能追蹤一個小的固定參考值，然後再閉合電壓環 (<code>TINV_closeGvLoop=1</code>)。</li>
+                            <li><strong><code>TINV_GI_RUN</code></strong>：同樣是 PI 控制器，<code>GI</code> 代表 Grid Current loop。</li>
+                            <li><strong><code>d</code> 軸和 <code>q</code> 軸</strong>：<code>d</code> 軸電流負責傳送<strong>有效功率</strong>，<code>q</code> 軸電流負責傳送<strong>無效功率</strong>。在 PFC 應用中，我們不希望從電網吸收無效功率，所以 <code>q</code> 軸電流的參考值 <code>TINV_iqRef_pu</code> 通常都設為 0。</li>
+                            <li><strong>解耦合與前饋 (Decoupling & Feed-forward)</strong>：看到那兩行又臭又長的 <code>TINV_vdInv_pu = ...</code> 了嗎？新手看到這個通常直接投降。你先別管細節，只要知道它的目的：
+                                <ul>
+                                    <li><strong>解耦合</strong>：在旋轉座標系裡，d 軸的變化會影響 q 軸，反之亦然。這幾項就是用來抵消這種「交叉感染」的。</li>
+                                    <li><strong>前饋</strong>：它直接把電網電壓 (<code>TINV_vGrid_dq0_pos.d</code>) 考慮進來。這樣 PI 控制器只需要去補償誤差和擾動就行了，大大減輕了 PI 的負擔，讓系統響應更快。</li>
+                                    <li><strong class="emphasize">這是進階技巧，但也是現代向量控制的標配。</strong> 你可以先把這些項當成一個「黑盒子」，知道它的作用是為了讓控制更漂亮就行。</li>
+                                </ul>
+                            </li>
+                        </ul>
+                    </li>
+                </ul>
+
+                <h3>第五站：執行 (Actuation) - 「PWM，給我動起來！」</h3>
+                <p>電流環算出了它需要的電壓 (<code>TINV_vdInv_pu</code>, <code>TINV_vqInv_pu</code>)。但這還只是 <code>dq</code> 座標系裡的抽象數字，硬體看不懂。我們得把它變回三相的 PWM 占空比。</p>
+                 <ul>
+                    <li><strong>在哪裡發生？</strong>
+                        <ol>
+                            <li><code>TINV_runISR1_lab7()</code> 內部</li>
+                            <li><code>TINV_HAL_updatePWMDuty()</code></li>
+                        </ol>
+                    </li>
+                    <li><strong>程式碼解剖：</strong>
+<pre><code><span class="comment">// in tinv_p65x.h, TINV_runISR1_lab7()</span>
+
+<span class="comment">// 1. 逆變換：把 dq 座標系的電壓指令，變回 abc 三相的電壓指令</span>
+<span class="comment">// 這一步也叫 Inverse Park Transform</span>
+<span class="function">DQ0_ABC_run</span>(&TINV_vInv_dq0,
+            TINV_vdInv_pu, TINV_vqInv_pu, TINV_vzInv_pu,
+            TINV_sine, TINV_cosine);
+
+<span class="comment">// 2. 加上各種補償（比如為了平衡中點電壓的補償）</span>
+TINV_duty_A_pu = TINV_vInv_dq0.a + TINV_duty_0_pu + ...;
+TINV_duty_B_pu = TINV_vInv_dq0.b + TINV_duty_0_pu + ...;
+TINV_duty_C_pu = TINV_vInv_dq0.c + TINV_duty_0_pu + ...;
+
+<span class="comment">// ... (占空比限幅)</span>
+
+<span class="comment">// 3. 最終執行：把計算好的三相占空比，寫入 ePWM 模組的硬體暫存器</span>
+<span class="keyword">if</span>(TINV_closeGiLoop == <span class="number">1</span>)
+{
+    <span class="function">TINV_HAL_updatePWMDuty</span>(TINV_duty_A_pu, TINV_duty_B_pu, TINV_duty_C_pu);
+}
+</code></pre>
+                    </li>
+                    <li><strong>學姊的避坑指南與碎碎念：</strong>
+                        <ul>
+                            <li><code>DQ0_ABC_run</code>：這是座標逆變換。它的作用就是把 <code>dq</code> 系統裡的直流命令，重新「調變」回三相交流的正弦波命令。</li>
+                            <li><code>TINV_HAL_updatePWMDuty</code>：這是旅程的終點。這個函式會把 <code>[-1, 1]</code> 的 PU 占空比，轉換成 ePWM 模組比較暫存器 <code>CMPA</code> 需要的具體數值，然後寫進去。下一秒，硬體就會產生對應的 PWM 波形，驅動功率開關。</li>
+                            <li>至此，一個完整的控制迴路就閉合了。從感測到執行，週而復始，在每個幾十微秒的中斷裡不斷循環。</li>
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+        </section>
+
+        <hr>
+
+        <section id="chapter-3">
+            <h2 class="chapter-toggle">第三章：新手上路實戰指南——學姊教你如何安全駕駛 ▼</h2>
+            <div class="chapter-content">
+                <p>理論講完了，你也差不多睡著了。現在講點實際的，你該怎麼一步一步把這個 PFC 跑起來，而且還不會把板子變成昂貴的煙火。</p>
+                <h3>第一步：從 Lab 5 開始，不要騷操作！</h3>
+                <p>這個專案的 Lab 設計是有道理的。PFC 相關的是 Lab 5, 6, 7。</p>
+                <ul>
+                    <li><strong>Lab 5 (開迴路測試)</strong>：這個模式下，沒有閉迴路。你可以手動設定一個固定的占空比，然後用示波器去量測 PWM 腳位，確認你的硬體驅動、接線都沒問題。<strong>這是硬體驗證，不過就別想下一步了！</strong></li>
+                    <li><strong>Lab 6 (閉合電流內環)</strong>：這個模式下，你可以手動給一個固定的、很小的負值 <code>Id_ref</code>，然後閉合電流環 (<code>TINV_closeGiLoop = 1</code>)。你的目標是：<strong>確認電流環可以穩定地追蹤這個小的參考值</strong>。用示波器去看輸入電流波形，它應該是一個漂亮的正弦波。如果這一步不穩定，通常是電流感測有問題，或是電流環 PI 參數不對。</li>
+                    <li><strong>Lab 7 (閉合電壓外環)</strong>：當 Lab 6 穩定後，你才能嘗試 Lab 7。先閉合電流環，再閉合電壓環 (<code>TINV_closeGvLoop = 1</code>)。系統會開始自動調整 <code>Id_ref</code> 來穩定 DC Bus 電壓。</li>
+                </ul>
+                <p class="pitfall"><strong>記住這個順序：硬體驗證 -> 內環驗證 -> 外環驗證。跳關的下場通常很慘烈。</strong></p>
+
+                <h3>第二步：Watch Window 是你的水晶球</h3>
+                <p>除錯時，<code>printf</code> 太慢了，示波器只能看波形。你的主戰場是 CCS 的 Watch Window。把下面這些關鍵變數拖進去，它們會告訴你系統裡發生了什麼事：</p>
+                <ul>
+                    <li><strong>PLL 狀態</strong>：
+                        <ul>
+                            <li><code>TINV_gridFreq_sensed_Hz</code>: 是不是 50/60Hz？</li>
+                            <li><code>TINV_vGrid_dq0_pos.q</code>: 是不是接近 0？</li>
+                            <li><code>TINV_vGrid_A_sensed_pu</code>: 監控輸入電壓，確保沒問題。</li>
+                        </ul>
+                    </li>
+                    <li><strong>電壓環狀態</strong>：
+                        <ul>
+                            <li><code>TINV_vBus_sensed_Volts</code>: 實際 DC 電壓是多少？</li>
+                            <li><code>TINV_vBusRef_pu</code>: 目標電壓是多少？</li>
+                            <li><code>TINV_gv_vBus_out</code>: 電壓環輸出了多大的能量命令？</li>
+                            <li><code>TINV_idRef_pu</code>: 電壓環最終給電流環的目標是多少？（應該是負值）</li>
+                        </ul>
+                    </li>
+                    <li><strong>電流環狀態</strong>：
+                        <ul>
+                            <li><code>TINV_iInv_dq0_pos.d</code>: 實際的 d 軸電流，是不是跟 <code>TINV_idRef_pu</code> 很接近？</li>
+                            <li><code>TINV_iInv_dq0_pos.q</code>: 實際的 q 軸電流，是不是在 0 附近？</li>
+                            <li><code>TINV_duty_A_pu</code>: 最終輸出的占空比是多少？有沒有飽和（達到 <code>±0.98</code>）？</li>
+                        </ul>
+                    </li>
+                    <li><strong>開關變數</strong>：
+                        <ul>
+                            <li><code>TINV_closeGiLoop</code>: 確認電流環是否閉合。</li>
+                            <li><code>TINV_closeGvLoop</code>: 確認電壓環是否閉合。</li>
+                            <li><code>TINV_boardFaultFlags</code>: 看看有沒有觸發任何硬體保護。</li>
+                        </ul>
+                    </li>
+                </ul>
+                <h3>第三步：安全永遠第一</h3>
+                <p>你操作的是高壓電！學姊可不想在社會新聞上看到你。</p>
+                <ul>
+                    <li><strong>先用隔離的低壓 AC 源 (e.g., 50V AC) 測試</strong>，不要直接上市電 (110V/220V)。</li>
+                    <li>確認你的示波器探頭是差動探頭，或者你非常清楚如何安全地進行浮地量測。</li>
+                    <li>保持實驗桌乾淨，手上不要戴金屬物品。</li>
+                </ul>
+            </div>
+        </section>
+
+        <hr>
+
+        <div class="dialogue senpai">
+            <div class="speaker senpai-name">學姊：</div>
+            <p>呼…講完了。嘴巴好乾。</p>
+            <span class="action">（她拿起你的水杯自顧自地喝了一大口，然後把杯子放回桌上，發出「叩」的一聲。）</span>
+            <p>怎麼樣，學弟？腦子裡的漿糊有沒有稍微變成豆花一樣，有點形狀了？我已經把整個流程、核心概念、關鍵程式碼和避坑指南都給你了。剩下的，就是你自己動手去試。從 Lab 5 開始，一步一步來，盯著 Watch Window，搞清楚每個變數的意義。</p>
+            <p>這套 Code 是個很好的學習範例，它把理論和實作結合得很好。你把它徹底搞懂了，以後做任何電力電子的控制專案，思路都會很清晰。</p>
+            <p>好了，我說完了。你慢慢消化吧。我得去休息了，教你這種笨蛋學弟，比我自己寫 Code 還累。</p>
+            <span class="action">（她伸了個懶腰，轉身準備離開，走了兩步又回過頭，用食指指著你。）</span>
+            <p>啊，對了。作為學費…</p>
+            <p class="emphasize" style="font-size: 1.2em;">明天早上，我桌上要看到一杯冰美式，大杯，不加糖。敢忘記的話，哼哼…</p>
+            <span class="action">（她做了個「你懂的」表情，然後笑著走開了，留下你一個人在座位上，看著眼前豁然開朗的程式碼，和空了一半的水杯，陷入了沉思。）</span>
+        </div>
+
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // 獲取所有的章節標題
+            const toggles = document.querySelectorAll('.chapter-toggle');
+
+            toggles.forEach(toggle => {
+                toggle.addEventListener('click', function() {
+                    // 獲取與標題相鄰的內容區塊
+                    const content = this.nextElementSibling;
+                    
+                    // 切換 collapsed class
+                    content.classList.toggle('collapsed');
+                    
+                    // 更新標題的箭頭指示
+                    if (content.classList.contains('collapsed')) {
+                        this.textContent = this.textContent.replace('▼', '►');
+                    } else {
+                        this.textContent = this.textContent.replace('►', '▼');
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>
